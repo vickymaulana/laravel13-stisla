@@ -4,20 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use App\Models\ActivityLog;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * File manager controller.
+ *
+ * Provides upload, download, update, delete, and folder management
+ * with ownership checks and path-traversal prevention.
+ */
 class FileManagerController extends Controller
 {
     /**
      * Display file manager.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $folder = $this->normalizeFolder($request->get('folder', '/'));
-        
+
         $query = File::where('user_id', auth()->id())
             ->where('folder', $folder)
             ->orderBy('created_at', 'desc');
@@ -44,7 +54,7 @@ class FileManagerController extends Controller
         }
 
         $files = $query->paginate(20);
-        
+
         // Get folders
         $folders = File::where('user_id', auth()->id())
             ->select('folder')
@@ -59,7 +69,7 @@ class FileManagerController extends Controller
     /**
      * Upload files.
      */
-    public function upload(Request $request)
+    public function upload(Request $request): RedirectResponse
     {
         $request->validate([
             'files' => 'required',
@@ -104,7 +114,7 @@ class FileManagerController extends Controller
     /**
      * Download a file.
      */
-    public function download($id)
+    public function download(int $id): StreamedResponse
     {
         $file = File::where('user_id', auth()->id())->findOrFail($id);
 
@@ -121,7 +131,7 @@ class FileManagerController extends Controller
     /**
      * Update file details.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
         $file = File::where('user_id', auth()->id())->findOrFail($id);
 
@@ -151,10 +161,10 @@ class FileManagerController extends Controller
     /**
      * Delete a file.
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $file = File::where('user_id', auth()->id())->findOrFail($id);
-        
+
         // Delete physical file
         if (Storage::disk('public')->exists($file->path)) {
             Storage::disk('public')->delete($file->path);
@@ -162,7 +172,7 @@ class FileManagerController extends Controller
 
         $fileName = $file->original_name;
         $folder = $file->folder;
-        
+
         $file->delete();
 
         ActivityLog::log(
@@ -178,7 +188,7 @@ class FileManagerController extends Controller
     /**
      * Get file details (AJAX).
      */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         $file = File::where('user_id', auth()->id())->findOrFail($id);
         return response()->json($file);
@@ -187,7 +197,7 @@ class FileManagerController extends Controller
     /**
      * Create folder.
      */
-    public function createFolder(Request $request)
+    public function createFolder(Request $request): RedirectResponse
     {
         $request->validate([
             'folder_name' => 'required|string|max:100|regex:/^[a-zA-Z0-9 _.-]+$/',
@@ -216,6 +226,8 @@ class FileManagerController extends Controller
 
     /**
      * Normalize user-provided folder path to reduce traversal risk.
+     *
+     * @throws ValidationException
      */
     private function normalizeFolder(?string $folder): string
     {

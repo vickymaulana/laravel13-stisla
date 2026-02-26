@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
+/**
+ * Authenticated user profile management.
+ */
 class ProfileController extends Controller
 {
     /**
      * Show the profile edit form.
      */
-    public function edit()
+    public function edit(): View
     {
         return view('profile.edit', ['user' => Auth::user()]);
     }
@@ -20,7 +25,7 @@ class ProfileController extends Controller
     /**
      * Update the authenticated user's profile.
      */
-    public function update(Request $request)
+    public function update(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
@@ -41,7 +46,7 @@ class ProfileController extends Controller
     /**
      * Show the change password form.
      */
-    public function changepassword()
+    public function changePassword(): View
     {
         return view('profile.changepassword', ['user' => Auth::user()]);
     }
@@ -49,7 +54,7 @@ class ProfileController extends Controller
     /**
      * Update the authenticated user's password.
      */
-    public function password(Request $request)
+    public function password(Request $request): RedirectResponse
     {
         $request->validate([
             'current_password' => ['required', 'string'],

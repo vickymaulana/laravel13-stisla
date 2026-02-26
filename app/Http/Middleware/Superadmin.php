@@ -18,6 +18,6 @@ class Superadmin
             return $next($request);
         }
 
-        abort(403, 'Tidak Memiliki Akses!');
+        abort(403, 'Unauthorized access.');
     }
 }

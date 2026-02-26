@@ -6,6 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Application setting stored in the database.
+ *
+ * Settings are grouped by category (general, email, social, appearance)
+ * and cached individually to avoid repeated queries.
+ *
+ * @property int         $id
+ * @property string      $key
+ * @property string|null $value
+ * @property string      $type
+ * @property string      $group
+ * @property string      $label
+ * @property string|null $description
+ * @property int|null    $order
+ */
 class Setting extends Model
 {
     use HasFactory;
@@ -21,14 +36,14 @@ class Setting extends Model
     ];
 
     /**
-     * Get a setting value by key
+     * Get a setting value by key.
      */
-    public static function get($key, $default = null)
+    public static function get(string $key, mixed $default = null): mixed
     {
         return Cache::remember("setting_{$key}", 3600, function () use ($key, $default) {
             $setting = static::where('key', $key)->first();
-            
-            if (!$setting) {
+
+            if (! $setting) {
                 return $default;
             }
 
@@ -37,9 +52,9 @@ class Setting extends Model
     }
 
     /**
-     * Set a setting value
+     * Set a setting value.
      */
-    public static function set($key, $value, $type = 'text')
+    public static function set(string $key, mixed $value, string $type = 'text'): static
     {
         $setting = static::updateOrCreate(
             ['key' => $key],
@@ -52,7 +67,9 @@ class Setting extends Model
     }
 
     /**
-     * Get all settings grouped
+     * Get all settings grouped by their group column.
+     *
+     * @return \Illuminate\Support\Collection
      */
     public static function getAllGrouped()
     {
@@ -60,11 +77,11 @@ class Setting extends Model
     }
 
     /**
-     * Cast value based on type
+     * Cast a raw value based on its declared type.
      */
-    protected static function castValue($value, $type)
+    protected static function castValue(mixed $value, string $type): mixed
     {
-        return match($type) {
+        return match ($type) {
             'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
             'number' => is_numeric($value) ? (int) $value : $value,
             'json' => json_decode($value, true),
@@ -73,9 +90,9 @@ class Setting extends Model
     }
 
     /**
-     * Clear all settings cache
+     * Clear all cached settings.
      */
-    public static function clearCache()
+    public static function clearCache(): void
     {
         $settings = static::all();
         foreach ($settings as $setting) {

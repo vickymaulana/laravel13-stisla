@@ -4,14 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use App\Models\ActivityLog;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Application settings management (superadmin only).
+ *
+ * Settings are grouped by category and support multiple input types
+ * including text, number, boolean, email, url, json, and textarea.
+ */
 class SettingController extends Controller
 {
     /**
      * Display the settings page.
      */
-    public function index()
+    public function index(): View
     {
         $settings = Setting::getAllGrouped();
         return view('settings.index', compact('settings'));
@@ -20,7 +28,7 @@ class SettingController extends Controller
     /**
      * Update the settings.
      */
-    public function update(Request $request)
+    public function update(Request $request): RedirectResponse
     {
         $request->validate([
             'settings' => 'required|array',
@@ -55,7 +63,7 @@ class SettingController extends Controller
     /**
      * Create a new setting.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'key' => 'required|string|unique:settings,key',
@@ -78,7 +86,7 @@ class SettingController extends Controller
     /**
      * Reset settings to default.
      */
-    public function reset(Request $request)
+    public function reset(Request $request): RedirectResponse
     {
         if ($request->group) {
             Setting::where('group', $request->group)->delete();

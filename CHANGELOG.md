@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2026-02-27
+
+### 🔄 Clean Code & Modernization
+- Updated base `Controller` to Laravel 12 abstract class style (removed legacy traits)
+- Added return type hints to all controller methods (`View`, `RedirectResponse`, `JsonResponse`, `StreamedResponse`)
+- Added typed parameters (`int $id`, `string $id`) to all controller action methods
+- Added class-level PHPDoc blocks to all controllers, models, and notification classes
+- Converted `$casts` property to `casts()` method in `ActivityLog` and `File` models (L12 convention)
+- Added relationship return types (`BelongsTo`, `MorphTo`) to all model relationships
+- Modernized `GeneralNotification` with constructor promotion and `readonly` properties
+- Removed unused `ShouldQueue` import from `GeneralNotification`
+- Renamed `ProfileController::changepassword()` → `changePassword()` for camelCase consistency
+- Updated route definition to match renamed method
+- Translated middleware abort message from Indonesian to English
+- Cleaned up `bootstrap/app.php` formatting
+
+### 🔧 Configuration & CI
+- Fixed `composer.json` branch-alias from `11.x-dev` → `12.x-dev`
+- Bumped CI PHP version to 8.3, Node.js to 22 LTS
+- Added Composer caching to CI pipeline
+- Added missing environment variables to CI test step
+
+### 📚 Documentation
+- Rewrote `README.MD` with professional formatting, version badges, and tables
+- Added "Why This Template?" comparison section
+- Added "Security" section documenting protection measures
+- Updated project structure to reflect current codebase
+- Updated tech stack table with current versions
+
+### ✅ Verified
+- All PHP files pass syntax check
+- `php artisan route:list` — all routes resolve correctly
+- `php artisan test` — all tests pass
+- `npm run build` — frontend builds successfully
+
 ## [2.1.0] - 2026-02-20
 
 ### 🐛 Fixed (Critical)

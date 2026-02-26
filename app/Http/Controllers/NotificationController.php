@@ -2,16 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Notifications\GeneralNotification;
 use App\Models\User;
+use App\Notifications\GeneralNotification;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * User notification management.
+ *
+ * Handles listing, reading, deleting, and (for admins) sending
+ * notifications via the database channel.
+ */
 class NotificationController extends Controller
 {
     /**
      * Display a listing of notifications.
      */
-    public function index()
+    public function index(): View
     {
         $notifications = auth()->user()
             ->notifications()
@@ -21,9 +30,9 @@ class NotificationController extends Controller
     }
 
     /**
-     * Mark notification as read.
+     * Mark notification as read and redirect to its action URL if set.
      */
-    public function markAsRead($id)
+    public function markAsRead(string $id): RedirectResponse
     {
         $notification = auth()->user()
             ->notifications()
@@ -41,7 +50,7 @@ class NotificationController extends Controller
     /**
      * Mark all notifications as read.
      */
-    public function markAllAsRead()
+    public function markAllAsRead(): RedirectResponse
     {
         auth()->user()->unreadNotifications->markAsRead();
 
@@ -52,7 +61,7 @@ class NotificationController extends Controller
     /**
      * Delete a notification.
      */
-    public function destroy($id)
+    public function destroy(string $id): RedirectResponse
     {
         $notification = auth()->user()
             ->notifications()
@@ -67,7 +76,7 @@ class NotificationController extends Controller
     /**
      * Delete all notifications.
      */
-    public function destroyAll()
+    public function destroyAll(): RedirectResponse
     {
         auth()->user()->notifications()->delete();
 
@@ -76,19 +85,19 @@ class NotificationController extends Controller
     }
 
     /**
-     * Get unread notifications count (for AJAX).
+     * Get unread notifications count (AJAX endpoint).
      */
-    public function unreadCount()
+    public function unreadCount(): JsonResponse
     {
         return response()->json([
-            'count' => auth()->user()->unreadNotifications()->count()
+            'count' => auth()->user()->unreadNotifications()->count(),
         ]);
     }
 
     /**
-     * Get recent notifications (for dropdown).
+     * Get recent notifications for the dropdown (AJAX endpoint).
      */
-    public function recent()
+    public function recent(): JsonResponse
     {
         $notifications = auth()->user()
             ->notifications()
@@ -100,9 +109,9 @@ class NotificationController extends Controller
     }
 
     /**
-     * Send a test notification.
+     * Send a test notification to the current user.
      */
-    public function sendTest()
+    public function sendTest(): RedirectResponse
     {
         auth()->user()->notify(new GeneralNotification(
             'Test Notification',
@@ -119,16 +128,16 @@ class NotificationController extends Controller
     /**
      * Show create notification form (admin only).
      */
-    public function create()
+    public function create(): View
     {
         $users = User::select('id', 'name', 'email')->get();
         return view('notifications.create', compact('users'));
     }
 
     /**
-     * Send notification to users (admin only).
+     * Send notification to selected users (admin only).
      */
-    public function send(Request $request)
+    public function send(Request $request): RedirectResponse
     {
         $request->validate([
             'title' => 'required|string|max:255',

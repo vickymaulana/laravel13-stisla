@@ -3,31 +3,28 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
+/**
+ * General-purpose database notification.
+ *
+ * Used for admin-sent messages, test notifications, and system alerts.
+ * Stored via the `database` channel so they appear in the notification center.
+ */
 class GeneralNotification extends Notification
 {
     use Queueable;
 
-    public $title;
-    public $message;
-    public $actionText;
-    public $actionUrl;
-    public $type;
-
     /**
      * Create a new notification instance.
      */
-    public function __construct($title, $message, $actionUrl = null, $actionText = 'View', $type = 'info')
-    {
-        $this->title = $title;
-        $this->message = $message;
-        $this->actionUrl = $actionUrl;
-        $this->actionText = $actionText;
-        $this->type = $type; // info, success, warning, danger
-    }
+    public function __construct(
+        public readonly string $title,
+        public readonly string $message,
+        public readonly ?string $actionUrl = null,
+        public readonly string $actionText = 'View',
+        public readonly string $type = 'info',
+    ) {}
 
     /**
      * Get the notification's delivery channels.

@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Activity log viewer (superadmin only).
+ *
+ * Provides a filterable log of all recorded user and system events.
+ */
 class ActivityLogController extends Controller
 {
     /**
      * Display a listing of activity logs.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $query = ActivityLog::with('user')->orderBy('created_at', 'desc');
 
@@ -36,7 +43,7 @@ class ActivityLogController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
                   ->orWhere('subject', 'like', "%{$search}%");
             });
@@ -51,7 +58,7 @@ class ActivityLogController extends Controller
     /**
      * Display the specified activity log.
      */
-    public function show($id)
+    public function show(int $id): View
     {
         $log = ActivityLog::with('user')->findOrFail($id);
         return view('activity-logs.show', compact('log'));
@@ -60,7 +67,7 @@ class ActivityLogController extends Controller
     /**
      * Remove the specified activity log from storage.
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $log = ActivityLog::findOrFail($id);
         $log->delete();
@@ -70,9 +77,9 @@ class ActivityLogController extends Controller
     }
 
     /**
-     * Remove all activity logs.
+     * Remove all activity logs, optionally filtered by retention period.
      */
-    public function clear(Request $request)
+    public function clear(Request $request): RedirectResponse
     {
         $request->validate([
             'confirm' => 'required|string|in:CLEAR',

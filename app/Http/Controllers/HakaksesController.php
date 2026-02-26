@@ -4,14 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\ActivityLog;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
+/**
+ * Role access management (superadmin only).
+ *
+ * Allows the superadmin to view, edit, and delete user roles.
+ */
 class HakaksesController extends Controller
 {
     /**
      * Display a listing of users with their roles.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $query = User::query();
 
@@ -31,7 +38,7 @@ class HakaksesController extends Controller
     /**
      * Show the form for editing the specified user's role.
      */
-    public function edit($id)
+    public function edit(int $id): View
     {
         $hakakses = User::findOrFail($id);
 
@@ -41,7 +48,7 @@ class HakaksesController extends Controller
     /**
      * Update the specified user's role.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
         $request->validate([
             'role' => ['required', 'string', 'in:user,superadmin'],
@@ -65,7 +72,7 @@ class HakaksesController extends Controller
     /**
      * Remove the specified user from storage.
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $user = User::findOrFail($id);
 

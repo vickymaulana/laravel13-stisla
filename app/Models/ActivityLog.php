@@ -4,7 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * Activity log entry.
+ *
+ * Records user and system events such as login, logout, profile updates,
+ * CRUD operations, and custom actions.  Each entry optionally references
+ * the related Eloquent model via a polymorphic relationship.
+ *
+ * @property int         $id
+ * @property int|null    $user_id
+ * @property string|null $subject
+ * @property string      $description
+ * @property string      $event
+ * @property string|null $model_type
+ * @property int|null    $model_id
+ * @property array|null  $properties
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ */
 class ActivityLog extends Model
 {
     use HasFactory;
@@ -21,14 +41,22 @@ class ActivityLog extends Model
         'user_agent',
     ];
 
-    protected $casts = [
-        'properties' => 'array',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'properties' => 'array',
+        ];
+    }
 
     /**
      * Get the user that owns the activity log.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -36,7 +64,7 @@ class ActivityLog extends Model
     /**
      * Get the related model (polymorphic).
      */
-    public function model()
+    public function model(): MorphTo
     {
         return $this->morphTo();
     }

@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+
+/**
+ * Stisla template example pages controller.
+ *
+ * Each method renders a different Stisla component showcase page
+ * so developers can preview available UI elements.
+ */
 class ExampleController extends Controller
 {
     /**
      * Display the table example page.
      */
-    public function table()
+    public function table(): View
     {
         return view('layouts.table-example');
     }
@@ -15,7 +23,7 @@ class ExampleController extends Controller
     /**
      * Display the clock example page.
      */
-    public function clock()
+    public function clock(): View
     {
         return view('layouts.clock-example');
     }
@@ -23,7 +31,7 @@ class ExampleController extends Controller
     /**
      * Display the chart example page.
      */
-    public function chart()
+    public function chart(): View
     {
         return view('layouts.chart-example');
     }
@@ -31,7 +39,7 @@ class ExampleController extends Controller
     /**
      * Display the form example page.
      */
-    public function form()
+    public function form(): View
     {
         return view('layouts.form-example');
     }
@@ -39,7 +47,7 @@ class ExampleController extends Controller
     /**
      * Display the map example page.
      */
-    public function map()
+    public function map(): View
     {
         return view('layouts.map-example');
     }
@@ -47,7 +55,7 @@ class ExampleController extends Controller
     /**
      * Display the calendar example page.
      */
-    public function calendar()
+    public function calendar(): View
     {
         return view('layouts.calendar-example');
     }
@@ -55,7 +63,7 @@ class ExampleController extends Controller
     /**
      * Display the gallery example page.
      */
-    public function gallery()
+    public function gallery(): View
     {
         return view('layouts.gallery-example');
     }
@@ -63,7 +71,7 @@ class ExampleController extends Controller
     /**
      * Display the todo example page.
      */
-    public function todo()
+    public function todo(): View
     {
         return view('layouts.todo-example');
     }
@@ -71,7 +79,7 @@ class ExampleController extends Controller
     /**
      * Display the contact example page.
      */
-    public function contact()
+    public function contact(): View
     {
         return view('layouts.contact-example');
     }
@@ -79,7 +87,7 @@ class ExampleController extends Controller
     /**
      * Display the FAQ example page.
      */
-    public function faq()
+    public function faq(): View
     {
         return view('layouts.faq-example');
     }
@@ -87,7 +95,7 @@ class ExampleController extends Controller
     /**
      * Display the news example page.
      */
-    public function news()
+    public function news(): View
     {
         return view('layouts.news-example');
     }
@@ -95,7 +103,7 @@ class ExampleController extends Controller
     /**
      * Display the about example page.
      */
-    public function about()
+    public function about(): View
     {
         return view('layouts.about-example');
     }

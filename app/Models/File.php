@@ -4,8 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Uploaded file record.
+ *
+ * Each file is owned by a user and stored via the `public` disk.
+ * Files are organized into user-defined folders and may be flagged
+ * as public or private.
+ *
+ * @property int         $id
+ * @property int         $user_id
+ * @property string      $name
+ * @property string      $original_name
+ * @property string      $path
+ * @property string      $mime_type
+ * @property int         $size
+ * @property string|null $extension
+ * @property string      $folder
+ * @property string|null $description
+ * @property bool        $is_public
+ */
 class File extends Model
 {
     use HasFactory;
@@ -23,22 +43,30 @@ class File extends Model
         'is_public',
     ];
 
-    protected $casts = [
-        'is_public' => 'boolean',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'is_public' => 'boolean',
+        ];
+    }
 
     /**
      * Get the user that uploaded the file.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /**
-     * Get file size in human readable format
+     * Get file size in human-readable format.
      */
-    public function getFormattedSizeAttribute()
+    public function getFormattedSizeAttribute(): string
     {
         $bytes = $this->size;
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -51,25 +79,25 @@ class File extends Model
     }
 
     /**
-     * Get file URL
+     * Get the public URL for the file.
      */
-    public function getUrlAttribute()
+    public function getUrlAttribute(): string
     {
         return Storage::url($this->path);
     }
 
     /**
-     * Check if file is an image
+     * Check if the file is an image.
      */
-    public function isImage()
+    public function isImage(): bool
     {
         return str_starts_with($this->mime_type, 'image/');
     }
 
     /**
-     * Check if file is a document
+     * Check if the file is a document.
      */
-    public function isDocument()
+    public function isDocument(): bool
     {
         $docMimes = [
             'application/pdf',
@@ -83,9 +111,9 @@ class File extends Model
     }
 
     /**
-     * Get icon class based on file type
+     * Get the Font Awesome icon class based on file type.
      */
-    public function getIconAttribute()
+    public function getIconAttribute(): string
     {
         if ($this->isImage()) {
             return 'fa-file-image text-info';
