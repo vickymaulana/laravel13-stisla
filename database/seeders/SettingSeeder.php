@@ -26,7 +26,7 @@ class SettingSeeder extends Seeder
             ],
             [
                 'key' => 'app_description',
-                'value' => 'A modern admin panel built with Laravel 12 and Stisla',
+                'value' => 'A modern admin panel built with Laravel 13 and Stisla',
                 'type' => 'textarea',
                 'group' => 'general',
                 'label' => 'Application Description',

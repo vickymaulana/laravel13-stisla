@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Welcome — laravel 12 Modern</title>
+  <title>Welcome — Laravel 13 Modern</title>
 
   <!-- Google Fonts: Poppins & Nunito -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -119,7 +119,7 @@
 
   <!-- HERO SECTION -->
   <section class="hero">
-    <h1 class="animate__animated animate__fadeInDown">Welcome to laravel 12</h1>
+    <h1 class="animate__animated animate__fadeInDown">Welcome to Laravel 13</h1>
     <p class="animate__animated animate__fadeInUp">
       Experience the modern, sleek, and powerful Laravel framework with a stylish design tailored for developers.
     </p>
@@ -134,9 +134,9 @@
         <div class="col-md-4" data-aos="flip-up">
           <div class="card feature-card p-4 text-center">
             <i class="fas fa-rocket"></i>
-            <h5 class="card-title mt-3">laravel 12</h5>
+            <h5 class="card-title mt-3">Laravel 13</h5>
             <p class="card-text">
-              Discover the latest features and enhancements in laravel 12, built for performance and simplicity.
+              Discover the latest features and enhancements in Laravel 13, built for performance and simplicity.
             </p>
           </div>
         </div>
@@ -202,7 +202,7 @@
   <!-- FOOTER -->
   <footer>
     <div class="container">
-      <p class="mb-1">&copy; {{ date('Y') }} laravel 12 Modern. All Rights Reserved.</p>
+      <p class="mb-1">&copy; {{ date('Y') }} Laravel 13 Modern. All Rights Reserved.</p>
       <p class="mb-0">Contributors: Vicky Maulana and LLDIKTI 2 Division of Information System Development Interns.</p>
     </div>
   </footer>

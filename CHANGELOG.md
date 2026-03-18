@@ -1,6 +1,37 @@
-# Changelog - Laravel 12 Stisla Template
+# Changelog - Laravel 13 Stisla Template
 
 All notable changes to this project will be documented in this file.
+
+## [4.0.0] - 2026-03-18
+
+### 🚀 Upgraded to Laravel 13
+- Bumped `laravel/framework` from `^12.0` to `^13.0`
+- Bumped minimum PHP requirement from `8.2` to `8.3`
+- Bumped `laravel/tinker` from `^2.10` to `^3.0`
+- Bumped `phpunit/phpunit` from `^11.5` to `^12.0`
+- Updated `branch-alias` from `12.x-dev` to `13.x-dev`
+- Added JSON schema, new convenience scripts (`setup`, `dev`, `test`), and `pre-package-uninstall` hook to `composer.json`
+
+### 🔄 Changed
+- Modernized base `Controller.php` to Laravel 13 style (removed explicit trait imports and base class extension)
+- Added `: void` return types to middleware and exception closures in `bootstrap/app.php`
+- Updated `config/cache.php` — new hyphenated prefix format, `serializable_classes` security hardening, `failover` store, `lock_table` option
+- Updated `config/session.php` — new `serialization` option, hyphenated cookie format, `(int)` cast on lifetime
+- Updated `config/app.php` — `(string)` cast on `APP_PREVIOUS_KEYS`
+- Updated `phpunit.xml` — added `BROADCAST_CONNECTION`, `DB_URL`, `NIGHTWATCH_ENABLED` env vars
+- Updated CI pipeline to PHP 8.4 (latest stable)
+- Updated `.env.example` app name to "Laravel 13 Stisla"
+
+### 📚 Documentation
+- Updated `README.MD` — title, badges, tech stack, prerequisites, CI table, and clone URL all reflect Laravel 13
+- Updated `CHANGELOG.md` title to "Laravel 13 Stisla Template"
+- Updated `LEARNING.md` title and docs link to Laravel 13
+
+### ✅ Verified
+- `composer validate` passes
+- All version references updated consistently across the codebase
+- Config files aligned with official `laravel/laravel` 13.x skeleton
+- No breaking changes to application-level code — existing controllers, models, middleware, and views are fully compatible
 
 ## [3.0.0] - 2026-02-27
 

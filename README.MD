@@ -1,13 +1,13 @@
-# Laravel 12 × Stisla Admin Template
+# Laravel 13 × Stisla Admin Template
 
-[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.3+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
 [![License](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/vickymaulana/laravel12-stisla/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/vickymaulana/laravel12-stisla/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/vickymaulana/laravel13-stisla/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/vickymaulana/laravel13-stisla/actions)
 
-> A production-ready Laravel 12 admin starter kit powered by the Stisla dashboard UI.  
+> A production-ready Laravel 13 admin starter kit powered by the Stisla dashboard UI.  
 > Clone → configure → start building business features immediately.
 
 ---
@@ -52,7 +52,7 @@
 
 ## Core Features
 
-- **Laravel 12 + PHP 8.2+** — latest framework with modern PHP features
+- **Laravel 13 + PHP 8.3+** — latest framework with modern PHP features
 - **Authentication** via Laravel UI (login, register, password reset)
 - **User Profile Management** — edit profile & change password
 - **Role & Permission Management** — powered by Spatie Laravel Permission
@@ -90,12 +90,12 @@
 ### Backend
 | Technology | Version | Purpose |
 |---|---|---|
-| PHP | ≥ 8.2 | Runtime |
-| Laravel | 12.x | Framework |
+| PHP | ≥ 8.3 | Runtime |
+| Laravel | 13.x | Framework |
 | Laravel UI | 4.x | Authentication scaffolding |
 | Livewire | 3.x | Reactive Blade components |
 | Spatie Permission | 6.x | Role and permission management |
-| PHPUnit | 11.x | Testing |
+| PHPUnit | 12.x | Testing |
 | Laravel Pint | 1.x | Code style |
 
 ### Frontend
@@ -112,7 +112,7 @@
 
 ## Prerequisites
 
-- PHP ≥ 8.2
+- PHP ≥ 8.3
 - Composer
 - Node.js ≥ 20
 - npm
@@ -125,8 +125,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/vickymaulana/laravel12-stisla.git
-cd laravel12-stisla
+git clone https://github.com/vickymaulana/laravel13-stisla.git
+cd laravel13-stisla
 
 # Install dependencies
 composer install
@@ -307,7 +307,7 @@ GitHub Actions workflow: `.github/workflows/ci.yml`
 
 | Step | Description |
 |---|---|
-| PHP 8.3 + SQLite | Environment setup |
+| PHP 8.4 + SQLite | Environment setup |
 | `composer install` | Backend dependencies |
 | `php artisan migrate` | Database schema |
 | `php artisan route:list` | Route integrity check |

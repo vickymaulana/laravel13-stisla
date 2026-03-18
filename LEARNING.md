@@ -1,4 +1,4 @@
-# Learning Guide - Laravel 12 Stisla Template
+# Learning Guide - Laravel 13 Stisla Template
 
 Welcome! This guide will help you learn Laravel using this template.
 
@@ -194,7 +194,7 @@ php artisan make:notification WelcomeNotification
 ## 📚 Additional Resources
 
 ### Official Documentation
-- [Laravel 12 Documentation](https://laravel.com/docs)
+- [Laravel 13 Documentation](https://laravel.com/docs)
 - [Bootstrap 5 Documentation](https://getbootstrap.com/docs/5.3)
 - [Stisla Documentation](https://getstisla.com/docs)
 
