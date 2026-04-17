@@ -2928,6 +2928,20 @@ pre {
 .section .section-header .section-header-breadcrumb .breadcrumb-item {
   font-size: 12px;
 }
+.section .section-header .section-header-breadcrumb .breadcrumb-item + .breadcrumb-item {
+  padding-left: 0;
+}
+.section .section-header .section-header-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  content: "/";
+  float: none;
+  display: inline-block;
+  padding: 0 6px;
+}
+.section .section-header .section-header-breadcrumb .breadcrumb-item a,
+.section .section-header .section-header-breadcrumb .breadcrumb-item a:hover,
+.section .section-header .section-header-breadcrumb .breadcrumb-item a:focus {
+  text-decoration: none;
+}
 .section .section-header .btn {
   font-size: 12px;
 }
