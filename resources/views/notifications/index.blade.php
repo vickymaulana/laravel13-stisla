@@ -22,9 +22,7 @@
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
@@ -80,7 +78,7 @@
                                                         <h6 class="mb-1">
                                                             {{ $data['title'] ?? 'Notification' }}
                                                             @if(!$notification->read_at)
-                                                                <span class="badge badge-primary">New</span>
+                                                                <span class="badge bg-primary">New</span>
                                                             @endif
                                                         </h6>
                                                         <p class="mb-1">{{ $data['message'] ?? '' }}</p>

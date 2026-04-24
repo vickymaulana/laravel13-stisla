@@ -14,17 +14,17 @@ use Illuminate\Support\Facades\Storage;
  * Files are organized into user-defined folders and may be flagged
  * as public or private.
  *
- * @property int         $id
- * @property int         $user_id
- * @property string      $name
- * @property string      $original_name
- * @property string      $path
- * @property string      $mime_type
- * @property int         $size
+ * @property int $id
+ * @property int $user_id
+ * @property string $name
+ * @property string $original_name
+ * @property string $path
+ * @property string $mime_type
+ * @property int $size
  * @property string|null $extension
- * @property string      $folder
+ * @property string $folder
  * @property string|null $description
- * @property bool        $is_public
+ * @property bool $is_public
  */
 class File extends Model
 {
@@ -75,7 +75,7 @@ class File extends Model
             $bytes /= 1024;
         }
 
-        return round($bytes, 2) . ' ' . $units[$i];
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**

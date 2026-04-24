@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -45,12 +46,12 @@ class ActivityLogController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%");
+                    ->orWhere('subject', 'like', "%{$search}%");
             });
         }
 
         $logs = $query->paginate(20);
-        $users = \App\Models\User::select('id', 'name')->get();
+        $users = User::select('id', 'name')->get();
 
         return view('activity-logs.index', compact('logs', 'users'));
     }
@@ -61,6 +62,7 @@ class ActivityLogController extends Controller
     public function show(int $id): View
     {
         $log = ActivityLog::with('user')->findOrFail($id);
+
         return view('activity-logs.show', compact('log'));
     }
 
@@ -90,6 +92,7 @@ class ActivityLogController extends Controller
 
         if ($retentionDays > 0) {
             ActivityLog::where('created_at', '<=', now()->subDays($retentionDays))->delete();
+
             return redirect()->route('activity-logs.index')
                 ->with('success', "Activity logs older than {$retentionDays} day(s) were cleared.");
         }

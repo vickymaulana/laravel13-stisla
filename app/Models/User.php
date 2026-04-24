@@ -10,23 +10,21 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * User Model
- * 
+ *
  * This model represents the users in the application.
  * It extends Laravel's Authenticatable class to provide authentication functionality.
- * 
+ *
  * Traits used:
  * - HasFactory: Enables model factories for testing and seeding
  * - Notifiable: Allows the model to send notifications
- * 
- * @package App\Models
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
-     * 
+     *
      * These attributes can be filled using mass assignment methods like create() or fill().
      * Only add attributes here that are safe to be mass-assigned.
      *

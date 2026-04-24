@@ -113,6 +113,7 @@
 ## Prerequisites
 
 - PHP ≥ 8.3
+- PHP extensions: `mbstring`, `pdo`, `pdo_sqlite`, `sqlite3`
 - Composer
 - Node.js ≥ 20
 - npm
@@ -144,6 +145,12 @@ php artisan storage:link
 # Development server
 npm run dev          # Terminal 1 — Vite dev server
 php artisan serve    # Terminal 2 — Laravel dev server
+```
+
+Or run the combined development stack:
+
+```bash
+composer run dev
 ```
 
 Open **http://localhost:8000** and register a new account.
@@ -289,6 +296,9 @@ stubs/                        # Generator stubs for CRUD scaffolding
 # Run the test suite
 php artisan test
 
+# Confirm SQLite testing support is available
+php -m | grep -E "pdo_sqlite|sqlite3"
+
 # Validate all routes resolve correctly
 php artisan route:list --except-vendor
 
@@ -333,6 +343,9 @@ To report a security vulnerability, please open a private issue or email the mai
 
 ### `php artisan route:list` fails
 Check for syntax or import errors in custom controllers.
+
+### `php artisan test` fails with `could not find driver`
+Enable `pdo_sqlite` and `sqlite3` for your PHP CLI installation. The test suite uses an in-memory SQLite database by default.
 
 ### Password reset / OTP issues
 - Verify `PASSWORD_RESET_METHOD` and `MAIL_*` settings in `.env`

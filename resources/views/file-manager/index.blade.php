@@ -43,9 +43,7 @@
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
@@ -57,10 +55,10 @@
                                     <i class="fas fa-folder"></i> {{ $folder }}
                                 </h4>
                                 <div class="card-header-action">
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
                                         <i class="fas fa-upload"></i> Upload Files
                                     </button>
-                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#createFolderModal">
+                                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#createFolderModal">
                                         <i class="fas fa-folder-plus"></i> New Folder
                                     </button>
                                 </div>
@@ -73,11 +71,9 @@
                                         <div class="col-md-6">
                                             <div class="input-group">
                                                 <input type="text" name="search" class="form-control" placeholder="Search files..." value="{{ request('search') }}">
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-primary" type="submit">
-                                                        <i class="fas fa-search"></i>
-                                                    </button>
-                                                </div>
+                                                <button class="btn btn-primary" type="submit">
+                                                    <i class="fas fa-search"></i>
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
@@ -120,7 +116,7 @@
                                                             <a href="{{ route('file-manager.download', $file->id) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()">
                                                                 <i class="fas fa-download"></i>
                                                             </a>
-                                                            <button type="button" class="btn btn-sm btn-info" onclick="event.stopPropagation(); editFile({{ $file->id }})" data-toggle="modal" data-target="#editModal{{ $file->id }}">
+                                                            <button type="button" class="btn btn-sm btn-info" onclick="event.stopPropagation(); editFile({{ $file->id }})" data-bs-toggle="modal" data-bs-target="#editModal{{ $file->id }}">
                                                                 <i class="fas fa-edit"></i>
                                                             </button>
                                                             <form action="{{ route('file-manager.destroy', $file->id) }}" method="POST" class="d-inline" onclick="event.stopPropagation()">
@@ -140,9 +136,7 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title">Edit File</h5>
-                                                                <button type="button" class="close" data-dismiss="modal">
-                                                                    <span>&times;</span>
-                                                                </button>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <form action="{{ route('file-manager.update', $file->id) }}" method="POST">
                                                                 @csrf
@@ -161,14 +155,14 @@
                                                                         <input type="text" name="folder" class="form-control" value="{{ $file->folder }}">
                                                                     </div>
                                                                     <div class="form-group">
-                                                                        <div class="custom-control custom-checkbox">
-                                                                            <input type="checkbox" class="custom-control-input" id="public{{ $file->id }}" name="is_public" value="1" {{ $file->is_public ? 'checked' : '' }}>
-                                                                            <label class="custom-control-label" for="public{{ $file->id }}">Public File</label>
+                                                                        <div class="form-check">
+                                                                            <input type="checkbox" class="form-check-input" id="public{{ $file->id }}" name="is_public" value="1" {{ $file->is_public ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="public{{ $file->id }}">Public File</label>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                                     <button type="submit" class="btn btn-primary">Save Changes</button>
                                                                 </div>
                                                             </form>
@@ -204,9 +198,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Upload Files</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('file-manager.upload') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -219,7 +211,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Upload</button>
                     </div>
                 </form>
@@ -233,9 +225,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Create New Folder</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('file-manager.create-folder') }}" method="POST">
                     @csrf
@@ -247,7 +237,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Create</button>
                     </div>
                 </form>

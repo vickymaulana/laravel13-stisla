@@ -26,9 +26,7 @@
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
@@ -65,14 +63,14 @@
                                                               class="form-control" 
                                                               rows="3">{{ old("settings.{$setting->key}", $setting->value) }}</textarea>
                                                 @elseif($setting->type === 'boolean')
-                                                    <div class="custom-control custom-switch">
+                                                    <div class="form-check form-switch">
                                                         <input type="checkbox" 
-                                                               class="custom-control-input" 
+                                                               class="form-check-input"
                                                                id="{{ $setting->key }}" 
                                                                name="settings[{{ $setting->key }}]"
                                                                value="1"
                                                                {{ old("settings.{$setting->key}", $setting->value) ? 'checked' : '' }}>
-                                                        <label class="custom-control-label" for="{{ $setting->key }}">
+                                                        <label class="form-check-label" for="{{ $setting->key }}">
                                                             {{ $setting->value ? 'Enabled' : 'Disabled' }}
                                                         </label>
                                                     </div>

@@ -60,7 +60,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h4>Vicky</h4>
-                            <span class="badge badge-primary">CEO</span>
+                            <span class="badge bg-primary">CEO</span>
                         </div>
                         <div class="card-body">
                             <p>
@@ -75,7 +75,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h4>Jane Smith</h4>
-                            <span class="badge badge-success">CTO</span>
+                            <span class="badge bg-success">CTO</span>
                         </div>
                         <div class="card-body">
                             <p>
@@ -90,7 +90,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h4>Mike Brown</h4>
-                            <span class="badge badge-warning">COO</span>
+                            <span class="badge bg-warning">COO</span>
                         </div>
                         <div class="card-body">
                             <p>

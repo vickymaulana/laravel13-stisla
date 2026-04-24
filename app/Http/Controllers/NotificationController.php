@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Notifications\SendNotificationRequest;
 use App\Models\User;
 use App\Notifications\GeneralNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
@@ -131,24 +131,15 @@ class NotificationController extends Controller
     public function create(): View
     {
         $users = User::select('id', 'name', 'email')->get();
+
         return view('notifications.create', compact('users'));
     }
 
     /**
      * Send notification to selected users (admin only).
      */
-    public function send(Request $request): RedirectResponse
+    public function send(SendNotificationRequest $request): RedirectResponse
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'message' => 'required|string',
-            'type' => 'required|in:info,success,warning,danger',
-            'users' => 'required|array',
-            'users.*' => 'exists:users,id',
-            'action_url' => 'nullable|url',
-            'action_text' => 'nullable|string',
-        ]);
-
         $users = User::whereIn('id', $request->users)->get();
 
         foreach ($users as $user) {
@@ -162,6 +153,6 @@ class NotificationController extends Controller
         }
 
         return redirect()->route('notifications.create')
-            ->with('success', 'Notification sent to ' . count($users) . ' user(s).');
+            ->with('success', 'Notification sent to '.count($users).' user(s).');
     }
 }

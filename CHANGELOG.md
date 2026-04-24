@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.1.0] - 2026-04-24
+
+### Updated
+- Updated Laravel 13 dependencies within the current major release line.
+- Added `laravel/pail` and wired it into the combined `composer run dev` workflow.
+- Updated frontend tooling within the current major release line and added `concurrently` as an explicit dev dependency.
+
+### Refactored
+- Extracted file manager folder normalization and file type filtering into reusable support classes.
+- Extracted default settings into a shared source used by both the seeder and settings reset flow.
+- Moved profile, settings, notification, file manager, and role access validation into Form Request classes.
+
+### Improved
+- Modernized application Blade views from Bootstrap 4 modal/alert/form helper attributes to Bootstrap 5 conventions.
+- Added focused unit tests for reusable support classes and Form Request rule contracts.
+- Documented the local SQLite PHP extensions required by the default test suite.
+
 ## [4.0.0] - 2026-03-18
 
 ### 🚀 Upgraded to Laravel 13

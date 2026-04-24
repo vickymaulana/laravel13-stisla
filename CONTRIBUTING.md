@@ -3,6 +3,11 @@
 Thanks for contributing to this project.
 
 ## Local quality checks
+Make sure your PHP CLI has SQLite testing support enabled:
+```bash
+php -m | grep -E "pdo_sqlite|sqlite3"
+```
+
 Run before opening PR:
 ```bash
 php artisan route:list --except-vendor
@@ -23,6 +28,7 @@ npm run build
 - Keep controllers focused and validate requests
 - Preserve backward compatibility where practical
 - Prefer route grouping by domain
+- Keep dependency upgrades within the current major version unless a release is explicitly planned as breaking
 
 ## Reporting issues
 Include:

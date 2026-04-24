@@ -45,7 +45,7 @@ class ForgotPasswordController extends Controller
     {
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return;
         }
 
@@ -70,6 +70,6 @@ class ForgotPasswordController extends Controller
      */
     protected function otpCacheKey(string $email): string
     {
-        return 'password-reset:otp:' . sha1(strtolower($email));
+        return 'password-reset:otp:'.sha1(strtolower($email));
     }
 }

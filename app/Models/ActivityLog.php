@@ -14,14 +14,14 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * CRUD operations, and custom actions.  Each entry optionally references
  * the related Eloquent model via a polymorphic relationship.
  *
- * @property int         $id
- * @property int|null    $user_id
+ * @property int $id
+ * @property int|null $user_id
  * @property string|null $subject
- * @property string      $description
- * @property string      $event
+ * @property string $description
+ * @property string $event
  * @property string|null $model_type
- * @property int|null    $model_id
- * @property array|null  $properties
+ * @property int|null $model_id
+ * @property array|null $properties
  * @property string|null $ip_address
  * @property string|null $user_agent
  */
@@ -95,7 +95,7 @@ class ActivityLog extends Model
         return static::create([
             'user_id' => $user->id,
             'subject' => 'User Login',
-            'description' => $user->name . ' logged into the system',
+            'description' => $user->name.' logged into the system',
             'event' => 'login',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
@@ -110,7 +110,7 @@ class ActivityLog extends Model
         return static::create([
             'user_id' => $user->id,
             'subject' => 'User Logout',
-            'description' => $user->name . ' logged out from the system',
+            'description' => $user->name.' logged out from the system',
             'event' => 'logout',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
@@ -125,7 +125,7 @@ class ActivityLog extends Model
         return static::create([
             'user_id' => $user->id,
             'subject' => 'Profile Updated',
-            'description' => $user->name . ' updated their profile',
+            'description' => $user->name.' updated their profile',
             'event' => 'updated',
             'model_type' => get_class($user),
             'model_id' => $user->id,
@@ -142,7 +142,7 @@ class ActivityLog extends Model
         return static::create([
             'user_id' => $user->id,
             'subject' => 'Password Changed',
-            'description' => $user->name . ' changed their password',
+            'description' => $user->name.' changed their password',
             'event' => 'updated',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),

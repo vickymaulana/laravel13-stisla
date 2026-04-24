@@ -26,18 +26,14 @@
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ session('error') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
@@ -50,9 +46,7 @@
                                 <form method="GET" action="{{ route('hakakses.index') }}">
                                     <div class="input-group">
                                         <input type="text" class="form-control" placeholder="Search by name or email..." name="search" value="{{ request('search') }}">
-                                        <div class="input-group-btn">
-                                            <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                                        </div>
+                                        <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                                     </div>
                                 </form>
                             </div>
@@ -77,7 +71,7 @@
                                                 <td>{{ $user->email }}</td>
                                                 <td>
                                                     @php($roleName = $user->getRoleNames()->first() ?? 'user')
-                                                    <span class="badge badge-{{ $user->hasRole('superadmin') ? 'danger' : 'primary' }}">
+                                                    <span class="badge bg-{{ $user->hasRole('superadmin') ? 'danger' : 'primary' }}">
                                                         {{ ucfirst($roleName) }}
                                                     </span>
                                                 </td>

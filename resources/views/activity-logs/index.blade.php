@@ -147,7 +147,7 @@
                                                                 default => 'warning'
                                                             };
                                                         @endphp
-                                                        <span class="badge badge-{{ $badgeColor }}">{{ ucfirst($log->event) }}</span>
+                                                        <span class="badge bg-{{ $badgeColor }}">{{ ucfirst($log->event) }}</span>
                                                     </td>
                                                     <td>
                                                         <div>{{ $log->description }}</div>

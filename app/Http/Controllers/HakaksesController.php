@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\Roles\UpdateUserRoleRequest;
 use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -26,7 +27,7 @@ class HakaksesController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -48,12 +49,8 @@ class HakaksesController extends Controller
     /**
      * Update the specified user's role.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(UpdateUserRoleRequest $request, int $id): RedirectResponse
     {
-        $request->validate([
-            'role' => ['required', 'string', 'in:user,superadmin'],
-        ]);
-
         $user = User::findOrFail($id);
         $user->syncRoles([$request->role]);
 

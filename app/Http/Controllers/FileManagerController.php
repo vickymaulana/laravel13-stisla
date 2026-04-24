@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\File;
+use App\Http\Requests\FileManager\CreateFolderRequest;
+use App\Http\Requests\FileManager\UpdateFileRequest;
+use App\Http\Requests\FileManager\UploadFilesRequest;
 use App\Models\ActivityLog;
+use App\Models\File;
+use App\Support\FileManager\FileTypeFilter;
+use App\Support\FileManager\FolderPath;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -26,7 +30,7 @@ class FileManagerController extends Controller
      */
     public function index(Request $request): View
     {
-        $folder = $this->normalizeFolder($request->get('folder', '/'));
+        $folder = FolderPath::normalize($request->get('folder', '/'));
 
         $query = File::where('user_id', auth()->id())
             ->where('folder', $folder)
@@ -34,24 +38,10 @@ class FileManagerController extends Controller
 
         // Search
         if ($request->filled('search')) {
-            $query->where('original_name', 'like', '%' . $request->search . '%');
+            $query->where('original_name', 'like', '%'.$request->search.'%');
         }
 
-        // Filter by type
-        if ($request->filled('type')) {
-            $type = $request->type;
-            if ($type === 'image') {
-                $query->where('mime_type', 'like', 'image/%');
-            } elseif ($type === 'document') {
-                $query->whereIn('mime_type', [
-                    'application/pdf',
-                    'application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    'application/vnd.ms-excel',
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                ]);
-            }
-        }
+        FileTypeFilter::apply($query, $request->input('type'));
 
         $files = $query->paginate(20);
 
@@ -69,21 +59,15 @@ class FileManagerController extends Controller
     /**
      * Upload files.
      */
-    public function upload(Request $request): RedirectResponse
+    public function upload(UploadFilesRequest $request): RedirectResponse
     {
-        $request->validate([
-            'files' => 'required',
-            'files.*' => 'file|max:10240|mimetypes:image/jpeg,image/png,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain,application/zip,application/x-rar-compressed',
-            'folder' => 'nullable|string',
-        ]);
-
-        $folder = $this->normalizeFolder($request->get('folder', '/'));
+        $folder = FolderPath::normalize($request->get('folder', '/'));
         $uploadedFiles = [];
 
         foreach ($request->file('files') as $file) {
             $originalName = $file->getClientOriginalName();
             $extension = $file->getClientOriginalExtension();
-            $name = Str::random(40) . '.' . $extension;
+            $name = Str::random(40).'.'.$extension;
             $path = $file->storeAs('uploads', $name, 'public');
 
             $uploadedFile = File::create([
@@ -100,7 +84,7 @@ class FileManagerController extends Controller
             $uploadedFiles[] = $uploadedFile;
 
             ActivityLog::log(
-                'File uploaded: ' . $originalName,
+                'File uploaded: '.$originalName,
                 'File Manager',
                 'created',
                 $uploadedFile
@@ -108,7 +92,7 @@ class FileManagerController extends Controller
         }
 
         return redirect()->route('file-manager.index', ['folder' => $folder])
-            ->with('success', count($uploadedFiles) . ' file(s) uploaded successfully.');
+            ->with('success', count($uploadedFiles).' file(s) uploaded successfully.');
     }
 
     /**
@@ -119,7 +103,7 @@ class FileManagerController extends Controller
         $file = File::where('user_id', auth()->id())->findOrFail($id);
 
         ActivityLog::log(
-            'File downloaded: ' . $file->original_name,
+            'File downloaded: '.$file->original_name,
             'File Manager',
             'custom',
             $file
@@ -131,24 +115,17 @@ class FileManagerController extends Controller
     /**
      * Update file details.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(UpdateFileRequest $request, int $id): RedirectResponse
     {
         $file = File::where('user_id', auth()->id())->findOrFail($id);
 
-        $request->validate([
-            'original_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'folder' => 'nullable|string',
-            'is_public' => 'boolean',
-        ]);
-
         $validated = $request->only(['original_name', 'description', 'is_public']);
-        $validated['folder'] = $this->normalizeFolder((string) $request->input('folder', '/'));
+        $validated['folder'] = FolderPath::normalize((string) $request->input('folder', '/'));
 
         $file->update($validated);
 
         ActivityLog::log(
-            'File updated: ' . $file->original_name,
+            'File updated: '.$file->original_name,
             'File Manager',
             'updated',
             $file
@@ -176,7 +153,7 @@ class FileManagerController extends Controller
         $file->delete();
 
         ActivityLog::log(
-            'File deleted: ' . $fileName,
+            'File deleted: '.$fileName,
             'File Manager',
             'deleted'
         );
@@ -191,63 +168,32 @@ class FileManagerController extends Controller
     public function show(int $id): JsonResponse
     {
         $file = File::where('user_id', auth()->id())->findOrFail($id);
+
         return response()->json($file);
     }
 
     /**
      * Create folder.
      */
-    public function createFolder(Request $request): RedirectResponse
+    public function createFolder(CreateFolderRequest $request): RedirectResponse
     {
-        $request->validate([
-            'folder_name' => 'required|string|max:100|regex:/^[a-zA-Z0-9 _.-]+$/',
-            'parent_folder' => 'nullable|string',
-        ]);
-
-        $parentFolder = $this->normalizeFolder($request->get('parent_folder', '/'));
-        $folderPath = $this->normalizeFolder(trim($parentFolder . '/' . $request->folder_name));
+        $parentFolder = FolderPath::normalize($request->get('parent_folder', '/'));
+        $folderPath = FolderPath::join($parentFolder, (string) $request->folder_name);
 
         // Create a placeholder file to represent the folder
         File::create([
             'user_id' => auth()->id(),
             'name' => '.folder',
             'original_name' => $request->folder_name,
-            'path' => 'folders/' . Str::random(40) . '.placeholder',
+            'path' => 'folders/'.Str::random(40).'.placeholder',
             'mime_type' => 'folder',
             'size' => 0,
             'folder' => $folderPath,
         ]);
 
-        Storage::disk('public')->makeDirectory('uploads' . $folderPath);
+        Storage::disk('public')->makeDirectory('uploads'.$folderPath);
 
         return redirect()->route('file-manager.index', ['folder' => $folderPath])
             ->with('success', 'Folder created successfully.');
-    }
-
-    /**
-     * Normalize user-provided folder path to reduce traversal risk.
-     *
-     * @throws ValidationException
-     */
-    private function normalizeFolder(?string $folder): string
-    {
-        $folder = trim((string) $folder);
-
-        if ($folder === '' || $folder === '/') {
-            return '/';
-        }
-
-        $folder = str_replace('\\', '/', $folder);
-        $parts = array_filter(explode('/', $folder), static fn ($part) => $part !== '' && $part !== '.');
-
-        foreach ($parts as $part) {
-            if ($part === '..') {
-                throw ValidationException::withMessages([
-                    'folder' => 'Invalid folder path.',
-                ]);
-            }
-        }
-
-        return '/' . implode('/', $parts);
     }
 }

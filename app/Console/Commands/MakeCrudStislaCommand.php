@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
 use App\Console\Commands\Traits\GeneratorHelpers;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class MakeCrudStislaCommand extends Command
 {
@@ -31,60 +31,60 @@ class MakeCrudStislaCommand extends Command
     public function handle()
     {
         $modelName = $this->argument('model');
-        
+
         // Validate model name
         if (empty($modelName)) {
             $this->error('Model name is required.');
+
             return 1;
         }
-        
+
         // Check if model exists
         $modelClass = $this->getModelClass($modelName);
-        if (!$modelClass) {
+        if (! $modelClass) {
             $this->error("Model {$modelName} does not exist.");
+
             return 1;
         }
-        
+
         $this->info("Generating CRUD for {$modelName}...");
-        
+
         // Get fields
         $fields = $this->getFields($modelClass);
-        
+
         if (empty($fields)) {
             $this->error('No fields found. Please specify fields using --fields option.');
+
             return 1;
         }
-        
+
         // Apply field exclusions
         $fields = $this->applyExclusions($fields);
-        
+
         $generated = [];
-        
+
         // Generate controller
         if ($this->generateController($modelName, $fields)) {
             $generated[] = "app/Http/Controllers/{$modelName}Controller.php";
         }
-        
+
         // Generate views
         $viewsGenerated = $this->generateViews($modelName, $fields);
         $generated = array_merge($generated, $viewsGenerated);
-        
+
         // Append routes
         if ($this->appendRoutes($modelName)) {
-            $generated[] = "routes/web.php (route appended)";
+            $generated[] = 'routes/web.php (route appended)';
         }
-        
+
         // Display results
         $this->displayResults($generated, $modelName);
-        
+
         return 0;
     }
 
     /**
      * Get fields for the model.
-     *
-     * @param string $modelClass
-     * @return array
      */
     protected function getFields(string $modelClass): array
     {
@@ -92,29 +92,26 @@ class MakeCrudStislaCommand extends Command
         $customFields = $this->option('fields');
         if ($customFields) {
             $parsed = $this->parseFieldsOption($customFields);
-            if (!empty($parsed)) {
+            if (! empty($parsed)) {
                 return $parsed;
             }
         }
-        
+
         // Try to get from migration
         $tableName = $this->getTableName($modelClass);
         if ($tableName) {
             $fields = $this->parseFieldsFromMigration($tableName);
-            if (!empty($fields)) {
+            if (! empty($fields)) {
                 return $fields;
             }
         }
-        
+
         // Fallback to fillable
         return $this->getFieldsFromFillable($modelClass);
     }
 
     /**
      * Apply field exclusions.
-     *
-     * @param array $fields
-     * @return array
      */
     protected function applyExclusions(array $fields): array
     {
@@ -122,41 +119,37 @@ class MakeCrudStislaCommand extends Command
         if (empty($except)) {
             return $fields;
         }
-        
+
         $excludeFields = array_map('trim', explode(',', $except));
-        
+
         foreach ($excludeFields as $field) {
             unset($fields[$field]);
         }
-        
+
         return $fields;
     }
 
     /**
      * Generate controller file.
-     *
-     * @param string $modelName
-     * @param array $fields
-     * @return bool
      */
     protected function generateController(string $modelName, array $fields): bool
     {
         $controllerPath = app_path("Http/Controllers/{$modelName}Controller.php");
-        
-        if (!$this->shouldOverwrite($controllerPath)) {
+
+        if (! $this->shouldOverwrite($controllerPath)) {
             return false;
         }
-        
+
         $stub = $this->getStub('controller-stisla');
-        
+
         // Build validation rules
         $validation = $this->buildValidationRules($fields);
-        
+
         // Prepare replacements
         $modelVariable = Str::camel($modelName);
         $routeName = Str::kebab(Str::plural($modelName));
         $viewPath = Str::kebab(Str::plural($modelName));
-        
+
         $content = $this->replacePlaceholders($stub, [
             'model' => $modelName,
             'modelVariable' => $modelVariable,
@@ -164,24 +157,21 @@ class MakeCrudStislaCommand extends Command
             'viewPath' => $viewPath,
             'validation' => $validation,
         ]);
-        
+
         File::put($controllerPath, $content);
-        
+
         return true;
     }
 
     /**
      * Build validation rules for fields.
-     *
-     * @param array $fields
-     * @return string
      */
     protected function buildValidationRules(array $fields): string
     {
         $rules = [];
-        
+
         foreach ($fields as $name => $type) {
-            $rule = match($type) {
+            $rule = match ($type) {
                 'string', 'varchar' => 'required|string|max:255',
                 'text', 'longText' => 'required|string',
                 'integer', 'bigInteger' => 'required|integer',
@@ -191,76 +181,67 @@ class MakeCrudStislaCommand extends Command
                 'datetime' => 'required|date',
                 default => 'required',
             };
-            
+
             $rules[] = "            '{$name}' => '{$rule}',";
         }
-        
+
         return implode("\n", $rules);
     }
 
     /**
      * Generate view files.
-     *
-     * @param string $modelName
-     * @param array $fields
-     * @return array
      */
     protected function generateViews(string $modelName, array $fields): array
     {
         $generated = [];
         $viewPath = Str::kebab(Str::plural($modelName));
         $viewDir = resource_path("views/{$viewPath}");
-        
+
         // Create directory if not exists
-        if (!File::isDirectory($viewDir)) {
+        if (! File::isDirectory($viewDir)) {
             File::makeDirectory($viewDir, 0755, true);
         }
-        
+
         // Generate index view
         if ($this->generateIndexView($modelName, $fields, $viewDir)) {
             $generated[] = "resources/views/{$viewPath}/index.blade.php";
         }
-        
+
         // Generate create view
         if ($this->generateCreateView($modelName, $fields, $viewDir)) {
             $generated[] = "resources/views/{$viewPath}/create.blade.php";
         }
-        
+
         // Generate edit view
         if ($this->generateEditView($modelName, $fields, $viewDir)) {
             $generated[] = "resources/views/{$viewPath}/edit.blade.php";
         }
-        
+
         // Generate show view
         if ($this->generateShowView($modelName, $fields, $viewDir)) {
             $generated[] = "resources/views/{$viewPath}/show.blade.php";
         }
-        
+
         return $generated;
     }
 
     /**
      * Generate index view.
-     *
-     * @param string $modelName
-     * @param array $fields
-     * @param string $viewDir
-     * @return bool
      */
     protected function generateIndexView(string $modelName, array $fields, string $viewDir): bool
     {
-        $viewPath = $viewDir . '/index.blade.php';
-        
-        if (!$this->shouldOverwrite($viewPath)) {
+        $viewPath = $viewDir.'/index.blade.php';
+
+        if (! $this->shouldOverwrite($viewPath)) {
             return false;
         }
-        
+
         $stub = $this->getStub('view-index-stisla');
-        
+
         // Build table headers and columns
         $tableHeaders = $this->buildTableHeaders($fields);
         $tableColumns = $this->buildTableColumns($fields);
-        
+
         $content = $this->replacePlaceholders($stub, [
             'modelTitle' => Str::plural($modelName),
             'modelVariable' => Str::camel($modelName),
@@ -269,206 +250,179 @@ class MakeCrudStislaCommand extends Command
             'tableColumns' => $tableColumns,
             'columnCount' => count($fields) + 1,
         ]);
-        
+
         File::put($viewPath, $content);
-        
+
         return true;
     }
 
     /**
      * Build table headers.
-     *
-     * @param array $fields
-     * @return string
      */
     protected function buildTableHeaders(array $fields): string
     {
         $headers = [];
         foreach (array_keys($fields) as $field) {
-            $headers[] = "                                        <th>" . Str::title(str_replace('_', ' ', $field)) . "</th>";
+            $headers[] = '                                        <th>'.Str::title(str_replace('_', ' ', $field)).'</th>';
         }
+
         return implode("\n", $headers);
     }
 
     /**
      * Build table columns.
-     *
-     * @param array $fields
-     * @return string
      */
     protected function buildTableColumns(array $fields): string
     {
         $modelVariable = Str::camel(array_key_first($fields) ?? 'item');
         $columns = [];
-        
+
         foreach (array_keys($fields) as $field) {
             $columns[] = "                                            <td>{{ \${$modelVariable}->{$field} }}</td>";
         }
-        
+
         return implode("\n", $columns);
     }
 
     /**
      * Generate create view.
-     *
-     * @param string $modelName
-     * @param array $fields
-     * @param string $viewDir
-     * @return bool
      */
     protected function generateCreateView(string $modelName, array $fields, string $viewDir): bool
     {
-        $viewPath = $viewDir . '/create.blade.php';
-        
-        if (!$this->shouldOverwrite($viewPath)) {
+        $viewPath = $viewDir.'/create.blade.php';
+
+        if (! $this->shouldOverwrite($viewPath)) {
             return false;
         }
-        
+
         $stub = $this->getStub('view-create-stisla');
-        
+
         // Build form fields
         $formFields = $this->buildFormFields($fields, false);
-        
+
         $content = $this->replacePlaceholders($stub, [
             'modelTitle' => $modelName,
             'routeName' => Str::kebab(Str::plural($modelName)),
             'formFields' => $formFields,
         ]);
-        
+
         File::put($viewPath, $content);
-        
+
         return true;
     }
 
     /**
      * Generate edit view.
-     *
-     * @param string $modelName
-     * @param array $fields
-     * @param string $viewDir
-     * @return bool
      */
     protected function generateEditView(string $modelName, array $fields, string $viewDir): bool
     {
-        $viewPath = $viewDir . '/edit.blade.php';
-        
-        if (!$this->shouldOverwrite($viewPath)) {
+        $viewPath = $viewDir.'/edit.blade.php';
+
+        if (! $this->shouldOverwrite($viewPath)) {
             return false;
         }
-        
+
         $stub = $this->getStub('view-edit-stisla');
-        
+
         // Build form fields with values
         $formFields = $this->buildFormFields($fields, true);
-        
+
         $content = $this->replacePlaceholders($stub, [
             'modelTitle' => $modelName,
             'modelVariable' => Str::camel($modelName),
             'routeName' => Str::kebab(Str::plural($modelName)),
             'formFields' => $formFields,
         ]);
-        
+
         File::put($viewPath, $content);
-        
+
         return true;
     }
 
     /**
      * Generate show view.
-     *
-     * @param string $modelName
-     * @param array $fields
-     * @param string $viewDir
-     * @return bool
      */
     protected function generateShowView(string $modelName, array $fields, string $viewDir): bool
     {
-        $viewPath = $viewDir . '/show.blade.php';
-        
-        if (!$this->shouldOverwrite($viewPath)) {
+        $viewPath = $viewDir.'/show.blade.php';
+
+        if (! $this->shouldOverwrite($viewPath)) {
             return false;
         }
-        
+
         $stub = $this->getStub('view-show-stisla');
-        
+
         // Build display fields
         $displayFields = $this->buildDisplayFields($fields);
-        
+
         $content = $this->replacePlaceholders($stub, [
             'modelTitle' => $modelName,
             'modelVariable' => Str::camel($modelName),
             'routeName' => Str::kebab(Str::plural($modelName)),
             'displayFields' => $displayFields,
         ]);
-        
+
         File::put($viewPath, $content);
-        
+
         return true;
     }
 
     /**
      * Build form fields for create/edit views.
-     *
-     * @param array $fields
-     * @param bool $withValue
-     * @return string
      */
     protected function buildFormFields(array $fields, bool $withValue = false): string
     {
         $formFields = [];
         $modelVariable = Str::camel(array_key_first($fields) ?? 'item');
-        
+
         foreach ($fields as $name => $type) {
             $label = Str::title(str_replace('_', ' ', $name));
             $inputType = $this->mapTypeToInputType($type, $name);
-            $value = $withValue ? " value=\"{{ \${$modelVariable}->{$name} }}\"" : "";
-            
+            $value = $withValue ? " value=\"{{ \${$modelVariable}->{$name} }}\"" : '';
+
             if ($inputType === 'textarea') {
-                $value = $withValue ? "{{ \${$modelVariable}->{$name} }}" : "";
-                $formFields[] = "                            <div class=\"form-group\">\n" .
-                               "                                <label>{$label}</label>\n" .
-                               "                                <textarea name=\"{$name}\" class=\"form-control @error('{$name}') is-invalid @enderror\" rows=\"3\">{$value}</textarea>\n" .
-                               "                                @error('{$name}')\n" .
-                               "                                    <div class=\"invalid-feedback\">{{ \$message }}</div>\n" .
-                               "                                @enderror\n" .
+                $value = $withValue ? "{{ \${$modelVariable}->{$name} }}" : '';
+                $formFields[] = "                            <div class=\"form-group\">\n".
+                               "                                <label>{$label}</label>\n".
+                               "                                <textarea name=\"{$name}\" class=\"form-control @error('{$name}') is-invalid @enderror\" rows=\"3\">{$value}</textarea>\n".
+                               "                                @error('{$name}')\n".
+                               "                                    <div class=\"invalid-feedback\">{{ \$message }}</div>\n".
+                               "                                @enderror\n".
                                "                            </div>\n";
             } elseif ($inputType === 'checkbox') {
-                $checked = $withValue ? " {{ \${$modelVariable}->{$name} ? 'checked' : '' }}" : "";
-                $formFields[] = "                            <div class=\"form-group\">\n" .
-                               "                                <div class=\"custom-control custom-checkbox\">\n" .
-                               "                                    <input type=\"checkbox\" name=\"{$name}\" value=\"1\" class=\"custom-control-input\" id=\"{$name}\"{$checked}>\n" .
-                               "                                    <label class=\"custom-control-label\" for=\"{$name}\">{$label}</label>\n" .
-                               "                                </div>\n" .
+                $checked = $withValue ? " {{ \${$modelVariable}->{$name} ? 'checked' : '' }}" : '';
+                $formFields[] = "                            <div class=\"form-group\">\n".
+                               "                                <div class=\"custom-control custom-checkbox\">\n".
+                               "                                    <input type=\"checkbox\" name=\"{$name}\" value=\"1\" class=\"custom-control-input\" id=\"{$name}\"{$checked}>\n".
+                               "                                    <label class=\"custom-control-label\" for=\"{$name}\">{$label}</label>\n".
+                               "                                </div>\n".
                                "                            </div>\n";
             } else {
-                $step = ($inputType === 'number' && in_array($type, ['decimal', 'float', 'double'])) ? " step=\"0.01\"" : "";
-                $formFields[] = "                            <div class=\"form-group\">\n" .
-                               "                                <label>{$label}</label>\n" .
-                               "                                <input type=\"{$inputType}\" name=\"{$name}\" class=\"form-control @error('{$name}') is-invalid @enderror\"{$value}{$step}>\n" .
-                               "                                @error('{$name}')\n" .
-                               "                                    <div class=\"invalid-feedback\">{{ \$message }}</div>\n" .
-                               "                                @enderror\n" .
+                $step = ($inputType === 'number' && in_array($type, ['decimal', 'float', 'double'])) ? ' step="0.01"' : '';
+                $formFields[] = "                            <div class=\"form-group\">\n".
+                               "                                <label>{$label}</label>\n".
+                               "                                <input type=\"{$inputType}\" name=\"{$name}\" class=\"form-control @error('{$name}') is-invalid @enderror\"{$value}{$step}>\n".
+                               "                                @error('{$name}')\n".
+                               "                                    <div class=\"invalid-feedback\">{{ \$message }}</div>\n".
+                               "                                @enderror\n".
                                "                            </div>\n";
             }
         }
-        
+
         return implode("\n", $formFields);
     }
 
     /**
      * Build display fields for show view.
-     *
-     * @param array $fields
-     * @return string
      */
     protected function buildDisplayFields(array $fields): string
     {
         $displayFields = [];
         $modelVariable = Str::camel(array_key_first($fields) ?? 'item');
-        
+
         foreach ($fields as $name => $type) {
             $label = Str::title(str_replace('_', ' ', $name));
-            
+
             if (in_array($type, ['date', 'datetime', 'timestamp'])) {
                 $value = "{{ \${$modelVariable}->{$name} ? \${$modelVariable}->{$name}->format('Y-m-d H:i') : '-' }}";
             } elseif (in_array($type, ['boolean', 'tinyInteger'])) {
@@ -476,68 +430,63 @@ class MakeCrudStislaCommand extends Command
             } else {
                 $value = "{{ \${$modelVariable}->{$name} ?? '-' }}";
             }
-            
-            $displayFields[] = "                        <div class=\"form-group row\">\n" .
-                              "                            <label class=\"col-sm-3 col-form-label font-weight-bold\">{$label}:</label>\n" .
-                              "                            <div class=\"col-sm-9\">\n" .
-                              "                                <p class=\"form-control-plaintext\">{$value}</p>\n" .
-                              "                            </div>\n" .
-                              "                        </div>";
+
+            $displayFields[] = "                        <div class=\"form-group row\">\n".
+                              "                            <label class=\"col-sm-3 col-form-label font-weight-bold\">{$label}:</label>\n".
+                              "                            <div class=\"col-sm-9\">\n".
+                              "                                <p class=\"form-control-plaintext\">{$value}</p>\n".
+                              "                            </div>\n".
+                              '                        </div>';
         }
-        
+
         return implode("\n", $displayFields);
     }
 
     /**
      * Append routes to web.php.
-     *
-     * @param string $modelName
-     * @return bool
      */
     protected function appendRoutes(string $modelName): bool
     {
         $routePath = base_path('routes/web.php');
         $content = File::get($routePath);
-        
+
         $routeName = Str::kebab(Str::plural($modelName));
-        
+
         // Check if route already exists
         if (Str::contains($content, "'{$routeName}'") || Str::contains($content, "\"{$routeName}\"")) {
             $this->warn("Route for {$routeName} already exists in web.php. Skipping route generation.");
+
             return false;
         }
-        
+
         // Append route
-        $route = "\n// Auto-generated routes for {$modelName}\n" .
+        $route = "\n// Auto-generated routes for {$modelName}\n".
                  "Route::resource('{$routeName}', App\\Http\\Controllers\\{$modelName}Controller::class);\n";
-        
+
         File::append($routePath, $route);
-        
+
         return true;
     }
 
     /**
      * Display generation results.
-     *
-     * @param array $generated
-     * @param string $modelName
-     * @return void
      */
     protected function displayResults(array $generated, string $modelName): void
     {
         if (empty($generated)) {
             $this->warn('No files generated (all files exist and overwrite declined).');
+
             return;
         }
-        
+
         $this->info('✓ Success! Generated files:');
         foreach ($generated as $file) {
             $this->line("  - {$file}");
         }
-        
+
         $this->newLine();
         $this->info('Next steps:');
-        $this->line("  1. Run migrations if not done: php artisan migrate");
-        $this->line("  2. Test your CRUD at: /". Str::kebab(Str::plural($modelName)));
+        $this->line('  1. Run migrations if not done: php artisan migrate');
+        $this->line('  2. Test your CRUD at: /'.Str::kebab(Str::plural($modelName)));
     }
 }

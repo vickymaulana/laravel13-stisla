@@ -114,10 +114,12 @@ class ResetPasswordController extends Controller
 
         if (! $hashedOtp || ! Hash::check((string) $request->otp, $hashedOtp)) {
             RateLimiter::hit($attemptKey, 60);
+
             return false;
         }
 
         RateLimiter::clear($attemptKey);
+
         return true;
     }
 
@@ -136,7 +138,7 @@ class ResetPasswordController extends Controller
      */
     protected function otpCacheKey(string $email): string
     {
-        return 'password-reset:otp:' . sha1($email);
+        return 'password-reset:otp:'.sha1($email);
     }
 
     /**
@@ -144,6 +146,6 @@ class ResetPasswordController extends Controller
      */
     protected function otpAttemptKey(string $email, ?string $ip = null): string
     {
-        return 'password-reset:otp-attempt:' . sha1($email . '|' . ($ip ?? 'unknown'));
+        return 'password-reset:otp-attempt:'.sha1($email.'|'.($ip ?? 'unknown'));
     }
 }

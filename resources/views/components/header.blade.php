@@ -7,7 +7,7 @@
     </a>
 
     <!-- Right Side Navbar Items -->
-    <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ms-auto">
         <li class="nav-item">
             <a
                 href="#"
@@ -25,13 +25,13 @@
             </a>
         </li>
         <li class="dropdown">
-            <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                <img alt="image" src="{{ asset('img/avatar/avatar-1.png') }}" class="rounded-circle mr-1">
+            <a href="#" data-bs-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+                <img alt="image" src="{{ asset('img/avatar/avatar-1.png') }}" class="rounded-circle me-1">
                 <div class="d-sm-none d-lg-inline-block">
                     Hi, {{ substr(auth()->user()->name, 0, 10) }}
                 </div>
             </a>
-            <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-end">
                 <div class="dropdown-title">
                     Welcome, {{ substr(auth()->user()->name, 0, 10) }}
                 </div>

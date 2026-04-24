@@ -2,72 +2,62 @@
 
 namespace App\Console\Commands\Traits;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 trait GeneratorHelpers
 {
     /**
      * Check if model exists and return the full class name.
-     *
-     * @param string $modelName
-     * @return string|null
      */
     protected function getModelClass(string $modelName): ?string
     {
-        $modelClass = "App\\Models\\" . Str::studly($modelName);
-        
+        $modelClass = 'App\\Models\\'.Str::studly($modelName);
+
         if (class_exists($modelClass)) {
             return $modelClass;
         }
-        
+
         return null;
     }
 
     /**
      * Parse migration files to extract field definitions.
-     *
-     * @param string $tableName
-     * @return array
      */
     protected function parseFieldsFromMigration(string $tableName): array
     {
         $migrationPath = database_path('migrations');
-        $files = File::glob($migrationPath . '/*_create_' . $tableName . '_table.php');
-        
+        $files = File::glob($migrationPath.'/*_create_'.$tableName.'_table.php');
+
         if (empty($files)) {
             return [];
         }
-        
+
         $migrationFile = $files[0];
         $content = File::get($migrationFile);
-        
+
         $fields = [];
-        
+
         // Extract column definitions
         preg_match_all('/\$table->(\w+)\([\'"](\w+)[\'"]/', $content, $matches, PREG_SET_ORDER);
-        
+
         foreach ($matches as $match) {
             $type = $match[1];
             $name = $match[2];
-            
+
             // Skip timestamp and id fields
             if (in_array($name, ['id', 'created_at', 'updated_at', 'deleted_at'])) {
                 continue;
             }
-            
+
             $fields[$name] = $type;
         }
-        
+
         return $fields;
     }
 
     /**
      * Map database column type to Faker method.
-     *
-     * @param string $type
-     * @param string $fieldName
-     * @return string
      */
     protected function mapTypeToFaker(string $type, string $fieldName): string
     {
@@ -93,9 +83,9 @@ trait GeneratorHelpers
         if (Str::contains($fieldName, ['description', 'content', 'body'])) {
             return 'fake()->paragraph()';
         }
-        
+
         // Map by type
-        return match($type) {
+        return match ($type) {
             'string', 'varchar' => 'fake()->sentence(3)',
             'text', 'longText', 'mediumText' => 'fake()->paragraph()',
             'integer', 'bigInteger', 'unsignedBigInteger', 'unsignedInteger' => 'fake()->numberBetween(1, 100)',
@@ -111,10 +101,6 @@ trait GeneratorHelpers
 
     /**
      * Map database column type to HTML input type.
-     *
-     * @param string $type
-     * @param string $fieldName
-     * @return string
      */
     protected function mapTypeToInputType(string $type, string $fieldName): string
     {
@@ -131,9 +117,9 @@ trait GeneratorHelpers
         if (Str::contains($fieldName, ['url', 'website'])) {
             return 'url';
         }
-        
+
         // Map by type
-        return match($type) {
+        return match ($type) {
             'text', 'longText', 'mediumText' => 'textarea',
             'integer', 'bigInteger', 'unsignedBigInteger', 'unsignedInteger' => 'number',
             'decimal', 'float', 'double' => 'number',
@@ -147,146 +133,125 @@ trait GeneratorHelpers
 
     /**
      * Check if file exists and confirm overwrite.
-     *
-     * @param string $path
-     * @return bool
      */
     protected function shouldOverwrite(string $path): bool
     {
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return true;
         }
-        
+
         return $this->confirm("File {$path} already exists. Overwrite?");
     }
 
     /**
      * Load stub template from project stubs or default.
-     *
-     * @param string $stubName
-     * @return string
      */
     protected function getStub(string $stubName): string
     {
         $projectStub = base_path("stubs/{$stubName}.stub");
-        
+
         if (File::exists($projectStub)) {
             return File::get($projectStub);
         }
-        
+
         // Fallback to default stub (should exist since we created them)
         return File::get($projectStub);
     }
 
     /**
      * Replace placeholders in stub content.
-     *
-     * @param string $stub
-     * @param array $replacements
-     * @return string
      */
     protected function replacePlaceholders(string $stub, array $replacements): string
     {
         foreach ($replacements as $key => $value) {
             $stub = str_replace("{{ {$key} }}", $value, $stub);
         }
-        
+
         return $stub;
     }
 
     /**
      * Get field definitions from fillable array if migration not found.
-     *
-     * @param string $modelClass
-     * @return array
      */
     protected function getFieldsFromFillable(string $modelClass): array
     {
-        if (!class_exists($modelClass)) {
+        if (! class_exists($modelClass)) {
             return [];
         }
-        
+
         $model = new $modelClass;
         $fillable = $model->getFillable();
-        
+
         // Return fields with default string type
         return array_fill_keys($fillable, 'string');
     }
 
     /**
      * Parse custom fields option string.
-     *
-     * @param string|null $fieldsOption
-     * @return array
      */
     protected function parseFieldsOption(?string $fieldsOption): array
     {
         if (empty($fieldsOption)) {
             return [];
         }
-        
+
         $fields = [];
         $fieldPairs = explode(',', $fieldsOption);
-        
+
         foreach ($fieldPairs as $pair) {
             if (str_contains($pair, ':')) {
                 [$name, $type] = explode(':', trim($pair));
                 $fields[trim($name)] = trim($type);
             }
         }
-        
+
         return $fields;
     }
 
     /**
      * Get table name from model class.
-     *
-     * @param string $modelClass
-     * @return string
      */
     protected function getTableName(string $modelClass): string
     {
-        if (!class_exists($modelClass)) {
+        if (! class_exists($modelClass)) {
             return '';
         }
-        
+
         $model = new $modelClass;
+
         return $model->getTable();
     }
 
     /**
      * Detect model relationships using reflection.
-     *
-     * @param string $modelClass
-     * @return array
      */
     protected function detectRelationships(string $modelClass): array
     {
-        if (!class_exists($modelClass)) {
+        if (! class_exists($modelClass)) {
             return [];
         }
-        
+
         $reflection = new \ReflectionClass($modelClass);
         $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
-        
+
         $relationships = [];
-        
+
         foreach ($methods as $method) {
             $returnType = $method->getReturnType();
-            
-            if (!$returnType) {
+
+            if (! $returnType) {
                 continue;
             }
-            
+
             $returnTypeName = $returnType->getName();
-            
+
             // Check if return type is a relationship
             if (Str::contains($returnTypeName, 'Illuminate\Database\Eloquent\Relations')) {
                 $relationType = class_basename($returnTypeName);
                 $relationships[$method->getName()] = $relationType;
             }
         }
-        
+
         return $relationships;
     }
 }

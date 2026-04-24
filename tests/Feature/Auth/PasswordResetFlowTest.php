@@ -43,7 +43,7 @@ class PasswordResetFlowTest extends TestCase
 
         $user = User::factory()->create();
         $token = Password::broker()->createToken($user);
-        Cache::put('password-reset:otp:' . sha1(strtolower($user->email)), Hash::make('123456'), now()->addMinutes(10));
+        Cache::put('password-reset:otp:'.sha1(strtolower($user->email)), Hash::make('123456'), now()->addMinutes(10));
 
         $invalidOtp = $this->from(route('password.reset', ['token' => $token, 'email' => $user->email]))
             ->post(route('password.update'), [

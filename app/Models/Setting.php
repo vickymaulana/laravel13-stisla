@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -12,14 +13,14 @@ use Illuminate\Support\Facades\Cache;
  * Settings are grouped by category (general, email, social, appearance)
  * and cached individually to avoid repeated queries.
  *
- * @property int         $id
- * @property string      $key
+ * @property int $id
+ * @property string $key
  * @property string|null $value
- * @property string      $type
- * @property string      $group
- * @property string      $label
+ * @property string $type
+ * @property string $group
+ * @property string $label
  * @property string|null $description
- * @property int|null    $order
+ * @property int|null $order
  */
 class Setting extends Model
 {
@@ -69,7 +70,7 @@ class Setting extends Model
     /**
      * Get all settings grouped by their group column.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getAllGrouped()
     {
