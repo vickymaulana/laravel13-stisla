@@ -1,11 +1,15 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "vickymaulana/laravel13-stisla",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A Laravel 13 admin starter kit powered by the Stisla dashboard UI.",
     "keywords": [
+        "admin-dashboard",
+        "admin-template",
         "laravel",
-        "framework"
+        "laravel-starter",
+        "stisla",
+        "starter-kit"
     ],
     "license": "MIT",
     "require": {
