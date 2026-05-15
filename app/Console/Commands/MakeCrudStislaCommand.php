@@ -240,7 +240,7 @@ class MakeCrudStislaCommand extends Command
 
         // Build table headers and columns
         $tableHeaders = $this->buildTableHeaders($fields);
-        $tableColumns = $this->buildTableColumns($fields);
+        $tableColumns = $this->buildTableColumns($fields, $modelName);
 
         $content = $this->replacePlaceholders($stub, [
             'modelTitle' => Str::plural($modelName),
@@ -272,9 +272,9 @@ class MakeCrudStislaCommand extends Command
     /**
      * Build table columns.
      */
-    protected function buildTableColumns(array $fields): string
+    protected function buildTableColumns(array $fields, ?string $modelName = null): string
     {
-        $modelVariable = Str::camel(array_key_first($fields) ?? 'item');
+        $modelVariable = Str::camel($modelName ?? 'item');
         $columns = [];
 
         foreach (array_keys($fields) as $field) {
@@ -298,7 +298,7 @@ class MakeCrudStislaCommand extends Command
         $stub = $this->getStub('view-create-stisla');
 
         // Build form fields
-        $formFields = $this->buildFormFields($fields, false);
+        $formFields = $this->buildFormFields($fields, false, $modelName);
 
         $content = $this->replacePlaceholders($stub, [
             'modelTitle' => $modelName,
@@ -325,7 +325,7 @@ class MakeCrudStislaCommand extends Command
         $stub = $this->getStub('view-edit-stisla');
 
         // Build form fields with values
-        $formFields = $this->buildFormFields($fields, true);
+        $formFields = $this->buildFormFields($fields, true, $modelName);
 
         $content = $this->replacePlaceholders($stub, [
             'modelTitle' => $modelName,
@@ -353,7 +353,7 @@ class MakeCrudStislaCommand extends Command
         $stub = $this->getStub('view-show-stisla');
 
         // Build display fields
-        $displayFields = $this->buildDisplayFields($fields);
+        $displayFields = $this->buildDisplayFields($fields, $modelName);
 
         $content = $this->replacePlaceholders($stub, [
             'modelTitle' => $modelName,
@@ -370,10 +370,10 @@ class MakeCrudStislaCommand extends Command
     /**
      * Build form fields for create/edit views.
      */
-    protected function buildFormFields(array $fields, bool $withValue = false): string
+    protected function buildFormFields(array $fields, bool $withValue = false, ?string $modelName = null): string
     {
         $formFields = [];
-        $modelVariable = Str::camel(array_key_first($fields) ?? 'item');
+        $modelVariable = Str::camel($modelName ?? 'item');
 
         foreach ($fields as $name => $type) {
             $label = Str::title(str_replace('_', ' ', $name));
@@ -392,9 +392,13 @@ class MakeCrudStislaCommand extends Command
             } elseif ($inputType === 'checkbox') {
                 $checked = $withValue ? " {{ \${$modelVariable}->{$name} ? 'checked' : '' }}" : '';
                 $formFields[] = "                            <div class=\"form-group\">\n".
-                               "                                <div class=\"custom-control custom-checkbox\">\n".
-                               "                                    <input type=\"checkbox\" name=\"{$name}\" value=\"1\" class=\"custom-control-input\" id=\"{$name}\"{$checked}>\n".
-                               "                                    <label class=\"custom-control-label\" for=\"{$name}\">{$label}</label>\n".
+                               "                                <input type=\"hidden\" name=\"{$name}\" value=\"0\">\n".
+                               "                                <div class=\"form-check\">\n".
+                               "                                    <input type=\"checkbox\" name=\"{$name}\" value=\"1\" class=\"form-check-input @error('{$name}') is-invalid @enderror\" id=\"{$name}\"{$checked}>\n".
+                               "                                    <label class=\"form-check-label\" for=\"{$name}\">{$label}</label>\n".
+                               "                                    @error('{$name}')\n".
+                               "                                        <div class=\"invalid-feedback\">{{ \$message }}</div>\n".
+                               "                                    @enderror\n".
                                "                                </div>\n".
                                "                            </div>\n";
             } else {
@@ -415,10 +419,10 @@ class MakeCrudStislaCommand extends Command
     /**
      * Build display fields for show view.
      */
-    protected function buildDisplayFields(array $fields): string
+    protected function buildDisplayFields(array $fields, ?string $modelName = null): string
     {
         $displayFields = [];
-        $modelVariable = Str::camel(array_key_first($fields) ?? 'item');
+        $modelVariable = Str::camel($modelName ?? 'item');
 
         foreach ($fields as $name => $type) {
             $label = Str::title(str_replace('_', ' ', $name));
@@ -426,7 +430,7 @@ class MakeCrudStislaCommand extends Command
             if (in_array($type, ['date', 'datetime', 'timestamp'])) {
                 $value = "{{ \${$modelVariable}->{$name} ? \${$modelVariable}->{$name}->format('Y-m-d H:i') : '-' }}";
             } elseif (in_array($type, ['boolean', 'tinyInteger'])) {
-                $value = "@if(\${$modelVariable}->{$name})<span class=\"badge badge-success\">Yes</span>@else<span class=\"badge badge-secondary\">No</span>@endif";
+                $value = "@if(\${$modelVariable}->{$name})<span class=\"badge bg-success\">Yes</span>@else<span class=\"badge bg-secondary\">No</span>@endif";
             } else {
                 $value = "{{ \${$modelVariable}->{$name} ?? '-' }}";
             }
@@ -459,13 +463,24 @@ class MakeCrudStislaCommand extends Command
             return false;
         }
 
-        // Append route
-        $route = "\n// Auto-generated routes for {$modelName}\n".
-                 "Route::resource('{$routeName}', App\\Http\\Controllers\\{$modelName}Controller::class);\n";
+        $route = $this->buildRouteDefinition($modelName);
 
         File::append($routePath, $route);
 
         return true;
+    }
+
+    /**
+     * Build an auth-protected resource route for the generated CRUD.
+     */
+    protected function buildRouteDefinition(string $modelName): string
+    {
+        $routeName = Str::kebab(Str::plural($modelName));
+
+        return "\n// Auto-generated routes for {$modelName}\n".
+               "Route::middleware('auth')->group(function () {\n".
+               "    Route::resource('{$routeName}', App\\Http\\Controllers\\{$modelName}Controller::class);\n".
+               "});\n";
     }
 
     /**
