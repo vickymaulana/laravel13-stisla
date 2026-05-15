@@ -305,6 +305,9 @@ php artisan route:list --except-vendor
 # Check code style (PSR-12)
 ./vendor/bin/pint --test
 
+# Remove development artifacts from vendored public assets
+php artisan assets:prune-vendored
+
 # Build production assets
 npm run build
 ```
