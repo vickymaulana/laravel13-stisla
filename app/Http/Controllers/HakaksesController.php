@@ -39,9 +39,9 @@ class HakaksesController extends Controller
     /**
      * Show the form for editing the specified user's role.
      */
-    public function edit(int $id): View
+    public function edit(User $user): View
     {
-        $hakakses = User::findOrFail($id);
+        $hakakses = $user;
 
         return view('layouts.hakakses.edit', compact('hakakses'));
     }
@@ -49,9 +49,8 @@ class HakaksesController extends Controller
     /**
      * Update the specified user's role.
      */
-    public function update(UpdateUserRoleRequest $request, int $id): RedirectResponse
+    public function update(UpdateUserRoleRequest $request, User $user): RedirectResponse
     {
-        $user = User::findOrFail($id);
         $user->syncRoles([$request->role]);
 
         ActivityLog::log(
@@ -68,10 +67,8 @@ class HakaksesController extends Controller
     /**
      * Remove the specified user from storage.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(User $user): RedirectResponse
     {
-        $user = User::findOrFail($id);
-
         // Prevent deleting yourself
         if ($user->id === auth()->id()) {
             return redirect()->route('hakakses.index')
