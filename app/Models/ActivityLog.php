@@ -72,7 +72,7 @@ class ActivityLog extends Model
     /**
      * Log a general activity.
      */
-    public static function log(string $description, ?string $subject = null, string $event = 'custom', $model = null, array $properties = []): static
+    public static function log(string $description, ?string $subject = null, string $event = 'custom', $model = null, array $properties = []): self
     {
         return static::create([
             'user_id' => auth()->id(),
@@ -90,7 +90,7 @@ class ActivityLog extends Model
     /**
      * Log user login.
      */
-    public static function logLogin($user): static
+    public static function logLogin($user): self
     {
         return static::create([
             'user_id' => $user->id,
@@ -105,7 +105,7 @@ class ActivityLog extends Model
     /**
      * Log user logout.
      */
-    public static function logLogout($user): static
+    public static function logLogout($user): self
     {
         return static::create([
             'user_id' => $user->id,
@@ -120,7 +120,7 @@ class ActivityLog extends Model
     /**
      * Log profile update.
      */
-    public static function logProfileUpdate($user): static
+    public static function logProfileUpdate($user): self
     {
         return static::create([
             'user_id' => $user->id,
@@ -137,7 +137,7 @@ class ActivityLog extends Model
     /**
      * Log password change.
      */
-    public static function logPasswordChange($user): static
+    public static function logPasswordChange($user): self
     {
         return static::create([
             'user_id' => $user->id,
