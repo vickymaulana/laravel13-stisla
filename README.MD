@@ -305,6 +305,12 @@ php artisan route:list --except-vendor
 # Check code style (PSR-12)
 ./vendor/bin/pint --test
 
+# Auto-fix code style
+composer lint
+
+# Run static analysis (Larastan / PHPStan, level 5)
+composer analyse
+
 # Remove development artifacts from vendored public assets
 php artisan assets:prune-vendored
 
@@ -322,10 +328,14 @@ GitHub Actions workflow: `.github/workflows/ci.yml`
 |---|---|
 | PHP 8.4 + SQLite | Environment setup |
 | `composer install` | Backend dependencies |
+| `vendor/bin/pint --test` | Code style check |
+| `vendor/bin/phpstan analyse` | Static analysis (Larastan, level 5) |
 | `php artisan migrate` | Database schema |
 | `php artisan route:list` | Route integrity check |
 | `php artisan test` | Test suite |
 | `npm ci` + `npm run build` | Frontend build |
+
+Dependency updates are automated with [Dependabot](.github/dependabot.yml) (Composer, npm, and GitHub Actions, weekly).
 
 ---
 
