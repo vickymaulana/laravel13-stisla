@@ -55,7 +55,7 @@ class Setting extends Model
     /**
      * Set a setting value.
      */
-    public static function set(string $key, mixed $value, string $type = 'text'): static
+    public static function set(string $key, mixed $value, string $type = 'text'): self
     {
         $setting = static::updateOrCreate(
             ['key' => $key],

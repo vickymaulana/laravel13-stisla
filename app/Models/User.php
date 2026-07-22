@@ -28,7 +28,7 @@ class User extends Authenticatable
      * These attributes can be filled using mass assignment methods like create() or fill().
      * Only add attributes here that are safe to be mass-assigned.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -39,7 +39,7 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $hidden = [
         'password',

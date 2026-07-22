@@ -55,7 +55,7 @@ class CrudStislaGeneratorTest extends TestCase
     }
 
     /**
-     * @param array<int, mixed> $arguments
+     * @param  array<int, mixed>  $arguments
      */
     private function invoke(MakeCrudStislaCommand $command, string $method, array $arguments): mixed
     {

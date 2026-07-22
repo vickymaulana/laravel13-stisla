@@ -239,7 +239,7 @@ trait GeneratorHelpers
         foreach ($methods as $method) {
             $returnType = $method->getReturnType();
 
-            if (! $returnType) {
+            if (! $returnType instanceof \ReflectionNamedType) {
                 continue;
             }
 

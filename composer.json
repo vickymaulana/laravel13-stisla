@@ -23,6 +23,7 @@
     "require-dev": {
         "fakerphp/faker": "^1.24",
         "kitloong/laravel-migrations-generator": "^7.0",
+        "larastan/larastan": "^3.0",
         "laravel/pail": "^1.2",
         "laravel/pint": "^1.21",
         "laravel/sail": "^1.42",
@@ -60,6 +61,9 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
+        "lint": "pint",
+        "lint:test": "pint --test",
+        "analyse": "phpstan analyse",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

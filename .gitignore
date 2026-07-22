@@ -22,6 +22,7 @@ yarn-error.log
 .github/skills/
 !.github/workflows/
 !.github/workflows/*.yml
+!.github/pull_request_template.md
 openspec
 # OS Files
 .DS_Store
