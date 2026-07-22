@@ -8,8 +8,18 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
+use App\Models\File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+/*
+ * Scope the {file} route parameter to the authenticated user's own files.
+ * A file that exists but belongs to another user resolves to a 404, so file
+ * existence is never leaked across accounts.
+ */
+Route::bind('file', function (string $value): File {
+    return File::where('user_id', Auth::id())->findOrFail($value);
+});
 
 Route::get('/', function () {
     return view('welcome');
@@ -28,26 +38,32 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
     Route::put('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
 
-    // Role access management (superadmin only)
-    Route::middleware('superadmin')->group(function () {
+    // Role access management (superadmin or manage-users permission)
+    Route::middleware('role_or_permission:superadmin|manage-users')->group(function () {
         Route::get('/hakakses', [HakaksesController::class, 'index'])->name('hakakses.index');
-        Route::get('/hakakses/edit/{id}', [HakaksesController::class, 'edit'])->name('hakakses.edit');
-        Route::put('/hakakses/update/{id}', [HakaksesController::class, 'update'])->name('hakakses.update');
-        Route::delete('/hakakses/delete/{id}', [HakaksesController::class, 'destroy'])->name('hakakses.delete');
+        Route::get('/hakakses/edit/{user}', [HakaksesController::class, 'edit'])->name('hakakses.edit');
+        Route::put('/hakakses/update/{user}', [HakaksesController::class, 'update'])->name('hakakses.update');
+        Route::delete('/hakakses/delete/{user}', [HakaksesController::class, 'destroy'])->name('hakakses.delete');
+    });
 
-        // Activity logs
+    // Activity logs (superadmin or manage-activity-logs permission)
+    Route::middleware('role_or_permission:superadmin|manage-activity-logs')->group(function () {
         Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
-        Route::get('/activity-logs/{id}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
-        Route::delete('/activity-logs/{id}', [ActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
+        Route::get('/activity-logs/{activityLog}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
+        Route::delete('/activity-logs/{activityLog}', [ActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
         Route::delete('/activity-logs', [ActivityLogController::class, 'clear'])->name('activity-logs.clear');
+    });
 
-        // Settings
+    // Settings (superadmin or manage-settings permission)
+    Route::middleware('role_or_permission:superadmin|manage-settings')->group(function () {
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
         Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
         Route::post('/settings/reset', [SettingController::class, 'reset'])->name('settings.reset');
+    });
 
-        // Notification admin actions
+    // Notification admin actions (superadmin or send-notifications permission)
+    Route::middleware('role_or_permission:superadmin|send-notifications')->group(function () {
         Route::get('/notifications/create', [NotificationController::class, 'create'])->name('notifications.create');
         Route::post('/notifications/send', [NotificationController::class, 'send'])->name('notifications.send');
     });
@@ -76,12 +92,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('notifications.destroy-all');
     Route::get('/notifications/send-test', [NotificationController::class, 'sendTest'])->name('notifications.send-test');
 
-    // File manager
+    // File manager ({file} is bound to the authenticated user's own files only)
     Route::get('/file-manager', [FileManagerController::class, 'index'])->name('file-manager.index');
     Route::post('/file-manager/upload', [FileManagerController::class, 'upload'])->name('file-manager.upload');
-    Route::get('/file-manager/{id}/download', [FileManagerController::class, 'download'])->name('file-manager.download');
-    Route::put('/file-manager/{id}', [FileManagerController::class, 'update'])->name('file-manager.update');
-    Route::delete('/file-manager/{id}', [FileManagerController::class, 'destroy'])->name('file-manager.destroy');
-    Route::get('/file-manager/{id}/show', [FileManagerController::class, 'show'])->name('file-manager.show');
+    Route::get('/file-manager/{file}/download', [FileManagerController::class, 'download'])->name('file-manager.download');
+    Route::put('/file-manager/{file}', [FileManagerController::class, 'update'])->name('file-manager.update');
+    Route::delete('/file-manager/{file}', [FileManagerController::class, 'destroy'])->name('file-manager.destroy');
+    Route::get('/file-manager/{file}/show', [FileManagerController::class, 'show'])->name('file-manager.show');
     Route::post('/file-manager/create-folder', [FileManagerController::class, 'createFolder'])->name('file-manager.create-folder');
 });

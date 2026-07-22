@@ -59,9 +59,9 @@ class ActivityLogController extends Controller
     /**
      * Display the specified activity log.
      */
-    public function show(int $id): View
+    public function show(ActivityLog $activityLog): View
     {
-        $log = ActivityLog::with('user')->findOrFail($id);
+        $log = $activityLog->load('user');
 
         return view('activity-logs.show', compact('log'));
     }
@@ -69,10 +69,9 @@ class ActivityLogController extends Controller
     /**
      * Remove the specified activity log from storage.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(ActivityLog $activityLog): RedirectResponse
     {
-        $log = ActivityLog::findOrFail($id);
-        $log->delete();
+        $activityLog->delete();
 
         return redirect()->route('activity-logs.index')
             ->with('success', 'Activity log deleted successfully.');

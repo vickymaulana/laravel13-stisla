@@ -98,10 +98,8 @@ class FileManagerController extends Controller
     /**
      * Download a file.
      */
-    public function download(int $id): StreamedResponse
+    public function download(File $file): StreamedResponse
     {
-        $file = File::where('user_id', auth()->id())->findOrFail($id);
-
         ActivityLog::log(
             'File downloaded: '.$file->original_name,
             'File Manager',
@@ -115,10 +113,8 @@ class FileManagerController extends Controller
     /**
      * Update file details.
      */
-    public function update(UpdateFileRequest $request, int $id): RedirectResponse
+    public function update(UpdateFileRequest $request, File $file): RedirectResponse
     {
-        $file = File::where('user_id', auth()->id())->findOrFail($id);
-
         $validated = $request->only(['original_name', 'description', 'is_public']);
         $validated['folder'] = FolderPath::normalize((string) $request->input('folder', '/'));
 
@@ -138,10 +134,8 @@ class FileManagerController extends Controller
     /**
      * Delete a file.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(File $file): RedirectResponse
     {
-        $file = File::where('user_id', auth()->id())->findOrFail($id);
-
         // Delete physical file
         if (Storage::disk('public')->exists($file->path)) {
             Storage::disk('public')->delete($file->path);
@@ -164,12 +158,24 @@ class FileManagerController extends Controller
 
     /**
      * Get file details (AJAX).
+     *
+     * Returns a safe, explicit subset of attributes so internal columns such
+     * as the storage path and owner id are never exposed to the client.
      */
-    public function show(int $id): JsonResponse
+    public function show(File $file): JsonResponse
     {
-        $file = File::where('user_id', auth()->id())->findOrFail($id);
-
-        return response()->json($file);
+        return response()->json([
+            'id' => $file->id,
+            'original_name' => $file->original_name,
+            'description' => $file->description,
+            'is_public' => $file->is_public,
+            'folder' => $file->folder,
+            'mime_type' => $file->mime_type,
+            'extension' => $file->extension,
+            'formatted_size' => $file->formatted_size,
+            'url' => $file->url,
+            'created_at' => $file->created_at,
+        ]);
     }
 
     /**
