@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.2.0] - 2026-07-21
+
+### Security
+- Refreshed backend dependencies within their existing constraints to clear all reported advisories (`laravel/framework`, `symfony/*`, `guzzlehttp/*`). `composer audit` now reports no vulnerabilities.
+- Refreshed frontend dependencies (`npm audit fix`) to clear all reported advisories, including the high-severity `axios` issues. `npm audit` now reports no vulnerabilities.
+- Restricted the file manager `show` endpoint to an explicit safe field subset so internal columns (storage path, owner id) are never exposed to the client.
+
+### Added
+- Static analysis via Larastan / PHPStan (level 5), wired into `composer analyse` and the CI pipeline.
+- `pint.json` (Laravel preset) plus `composer lint` / `composer lint:test`, with Pint style checking enforced in CI.
+- Pull request template.
+- Feature tests for the granular permission gates and the hardened file manager `show` response.
+
+### Changed
+- Admin routes are now gated with granular Spatie permissions (`role_or_permission:superadmin|<permission>`) instead of only the coarse `superadmin` role, so non-superadmin roles can be granted specific capabilities. Existing superadmin behaviour is unchanged.
+- Adopted route-model binding for user, activity-log, and file routes; the `{file}` binding is scoped to the authenticated user so foreign files resolve to a 404.
+- Form Requests for settings, notifications, and role management now enforce authorization instead of returning `true`.
+
+### Fixed
+- Resolved all PHPStan level 5 findings (reflection type guard, model factory return types, and `list<string>` property annotations).
+
 ## [4.1.0] - 2026-04-24
 
 ### Updated
